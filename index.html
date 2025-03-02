@@ -227,8 +227,8 @@
             const tableBody = document.querySelector('#tickets-table tbody');
             tableBody.innerHTML = '';
 
-            // Show rows that have either a list price OR sale type of "Coming Soon"
-            const filteredData = data.filter(ticket => ticket.listPrice || ticket.saleType === "Coming Soon");
+            // Show rows that have either a list price OR are marked as coming soon
+            const filteredData = data.filter(ticket => ticket.listPrice || ticket.isComingSoon);
 
             if (filteredData.length === 0) {
                 const row = document.createElement('tr');
@@ -246,7 +246,7 @@
                     <td>${ticket.saleType}</td>
                     <td>${ticket.listPrice}</td>
                     <td>${ticket.stubhubPrice}</td>
-                    <td>${ticket.saleType === "Coming Soon" ?
+                    <td>${ticket.isComingSoon ?
                         '<span class="coming-soon">Coming Soon</span>' :
                         `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}">Inquire</a>`}</td>
                 `;
@@ -313,7 +313,9 @@
                 filteredData = filteredData.filter(ticket => ticket.date === dateValue);
             }
 
-            if (typeValue) {
+            if (typeValue === "Coming Soon") {
+                filteredData = filteredData.filter(ticket => ticket.isComingSoon);
+            } else if (typeValue) {
                 filteredData = filteredData.filter(ticket => ticket.saleType === typeValue);
             }
 
@@ -372,13 +374,19 @@
                     const listPrice = row[4] ? row[4] : '';
                     const saleType = row[3] || '';
 
-                    // Include rows that have either a list price OR are "Coming Soon"
-                    if (listPrice || saleType === "Coming Soon") {
+                    // Check if it's a coming soon ticket (case insensitive and includes partial matches)
+                    const isComingSoon = saleType.toLowerCase().includes('coming') ||
+                        saleType.toLowerCase().includes('soon') ||
+                        saleType.toLowerCase().includes('upcoming');
+
+                    // Include rows that have either a list price OR are some variation of "Coming Soon"
+                    if (listPrice || isComingSoon) {
                         return {
                             concert: row[0] || '',
                             date: row[1] || '',
                             seat: row[2] || '',
                             saleType: saleType,
+                            isComingSoon: isComingSoon,
                             listPrice: listPrice,
                             stubhubPrice: row[5] || ''
                         };
