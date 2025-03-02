@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --primary-color: #3a0ca3;
@@ -504,7 +506,7 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Premium Concert Tickets. All rights reserved.</p>
+            <p>&copy; 2025 Ford Amphitheater Concert Tickets. All rights reserved.</p>
         </div>
     </footer>
 
@@ -552,12 +554,12 @@
         // Format price to ensure $ symbol and proper formatting
         function formatPrice(price) {
             if (!price) return '';
-            
+
             // If price doesn't start with $, add it
             if (!price.startsWith('$')) {
                 price = '$' + price;
             }
-            
+
             return price;
         }
 
@@ -578,7 +580,7 @@
 
             filteredData.forEach(ticket => {
                 const row = document.createElement('tr');
-                
+
                 // Create the badge for sale type
                 let saleTypeBadge = '';
                 if (ticket.saleType.toLowerCase().includes('family')) {
@@ -588,7 +590,7 @@
                 } else {
                     saleTypeBadge = ticket.saleType;
                 }
-                
+
                 row.innerHTML = `
                     <td><strong>${ticket.concert}</strong></td>
                     <td class="concert-date"><i class="far fa-calendar-alt"></i> ${ticket.date}</td>
