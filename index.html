@@ -205,8 +205,18 @@
 
         // Initialize the Google Sheets API client
         function initClient() {
+            // Get API key from environment variable
+            const apiKey = process.env.GOOGLE_API_KEY || '';
+
+            if (!apiKey) {
+                console.error('API key not found. Make sure to set the GOOGLE_API_KEY environment variable in Netlify.');
+                const tableBody = document.querySelector('#tickets-table tbody');
+                tableBody.innerHTML = '<tr><td colspan="7">Configuration error. Please contact the administrator.</td></tr>';
+                return;
+            }
+
             gapi.client.init({
-                apiKey: process.env.GOOGLE_API_KEY, // Your actual API key
+                apiKey: apiKey,
                 discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
             }).then(() => {
                 // Load data immediately
