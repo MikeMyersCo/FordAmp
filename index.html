@@ -510,7 +510,14 @@
         </div>
     </footer>
 
-    <script src="process-env.js"></script>
+    <script>
+        // Check if we're in development mode (on localhost)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            document.write('<script src="local-env.js"><\/script>');
+        } else {
+            document.write('<script src="process-env.js"><\/script>');
+        }
+    </script>
     <script>
         // Load the Google Sheets API
         function loadGoogleSheetsAPI() {
