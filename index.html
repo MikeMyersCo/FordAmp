@@ -365,7 +365,7 @@
                 document.getElementById('tickets-table').classList.add('loading');
 
                 const response = await gapi.client.sheets.spreadsheets.values.get({
-                    spreadsheetId: '1B9sh2TR74yC1oBHTrTMSuBWRDYTroaRN3BYnLaeg0P0', // Your actual spreadsheet ID
+                    spreadsheetId: window.ENV.SPREADSHEET_ID,
                     range: '2025!A2:Q',  // Your sheet range
                 });
 
