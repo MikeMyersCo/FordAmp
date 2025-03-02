@@ -227,6 +227,35 @@
         .button.error:hover {
             background-color: #d63d63;
         }
+        
+        .button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .button.secondary.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-container {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+        
+        .view-container.active {
+            display: block;
+        }
 
         .table-container {
             background-color: white;
@@ -234,6 +263,250 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             margin-bottom: 40px;
+        }
+        
+        /* Calendar Styles */
+        .calendar-container {
+            padding: 20px;
+        }
+        
+        .month-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .month-navigation h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        
+        .calendar-day-header {
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+            background-color: var(--primary-light);
+            color: white;
+            border-radius: 6px;
+        }
+        
+        .calendar-day {
+            min-height: 120px;
+            border-radius: 6px;
+            border: 1px solid var(--grey-light);
+            padding: 10px;
+            position: relative;
+        }
+        
+        .calendar-day.empty {
+            background-color: var(--grey-light);
+            opacity: 0.5;
+        }
+        
+        .calendar-day-number {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-weight: 700;
+            color: var(--grey-dark);
+        }
+        
+        .calendar-day.today {
+            border: 2px solid var(--primary-color);
+        }
+        
+        .calendar-day.today .calendar-day-number {
+            color: var(--primary-color);
+        }
+        
+        .concert-event {
+            background-color: var(--primary-light);
+            color: white;
+            border-radius: 4px;
+            padding: 5px 8px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .concert-event:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .concert-event.family {
+            background-color: var(--success);
+        }
+        
+        .concert-event.stubhub {
+            background-color: var(--secondary-color);
+        }
+        
+        .concert-event.coming-soon {
+            background-color: var(--warning);
+            color: var(--text-dark);
+        }
+        
+        .concert-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 25px;
+            width: 90%;
+            max-width: 700px;
+            z-index: 100;
+            display: none;
+            max-height: 90vh;
+            overflow: hidden;
+        }
+        
+        .concert-popup.active {
+            display: block;
+        }
+        
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 99;
+            display: none;
+        }
+        
+        .popup-overlay.active {
+            display: block;
+        }
+        
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .popup-content h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        .popup-content p {
+            margin: 5px 0;
+        }
+        
+        .popup-ticket-count {
+            background-color: var(--primary-light);
+            color: white;
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .popup-ticket-count i {
+            margin-right: 5px;
+        }
+        
+        .popup-tickets {
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .popup-tickets-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .popup-tickets-table th,
+        .popup-tickets-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--grey-light);
+        }
+        
+        .popup-tickets-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .popup-tickets-table tr:hover {
+            background-color: rgba(72, 149, 239, 0.05);
+        }
+        
+        .popup-tickets-table .button {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+        
+        .popup-tickets-table .badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+        }
+        
+        .popup-tickets-table .price {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 600px) {
+            .popup-tickets-table {
+                font-size: 0.8rem;
+            }
+            
+            .popup-tickets-table th,
+            .popup-tickets-table td {
+                padding: 5px;
+            }
+            
+            .popup-content {
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+        }
+        
+        .ticket-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--grey-light);
+            background-color: var(--light-bg);
+        }
+        
+        .ticket-item p {
+            margin: 5px 0;
+        }
+        
+        .ticket-item .button {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            padding: 6px 12px;
         }
 
         table {
@@ -406,6 +679,46 @@
                 gap: 15px;
             }
 
+            .view-toggle {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .action-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .month-navigation {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .month-navigation button {
+                width: 100%;
+            }
+            
+            .calendar-grid {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 5px;
+            }
+            
+            .calendar-day {
+                min-height: 80px;
+                padding: 5px;
+            }
+            
+            .calendar-day-header {
+                padding: 5px;
+                font-size: 0.8rem;
+            }
+            
+            .concert-event {
+                font-size: 0.7rem;
+                padding: 3px 5px;
+            }
+            
             table {
                 font-size: 0.9rem;
             }
@@ -446,6 +759,14 @@
             <div class="refresh-container">
                 <button id="refresh-button" class="button">
                     <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+            </div>
+            <div class="view-toggle">
+                <button id="table-view-button" class="button secondary active">
+                    <i class="fas fa-table"></i> Table View
+                </button>
+                <button id="calendar-view-button" class="button secondary">
+                    <i class="fas fa-calendar-alt"></i> Calendar View
                 </button>
             </div>
             <div class="last-update">
@@ -494,7 +815,8 @@
             </div>
         </div>
 
-        <div class="table-container">
+        <!-- Table View -->
+        <div id="table-view" class="table-container view-container active">
             <table id="tickets-table">
                 <thead>
                     <tr>
@@ -513,6 +835,40 @@
             </table>
             <div class="loading-spinner">
                 <div class="spinner"></div>
+            </div>
+        </div>
+        
+        <!-- Calendar View -->
+        <div id="calendar-view" class="calendar-container view-container">
+            <div class="month-navigation">
+                <button id="prev-month" class="button secondary">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <h2 id="current-month">Month Year</h2>
+                <button id="next-month" class="button secondary">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="calendar-grid">
+                <!-- Calendar will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Popup for Concert Details -->
+        <div class="popup-overlay" id="popup-overlay"></div>
+        <div class="concert-popup" id="concert-popup">
+            <button class="popup-close" id="popup-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="popup-content">
+                <h3 id="popup-concert-name">Concert Name</h3>
+                <p><i class="far fa-calendar-alt"></i> <span id="popup-concert-date">Date</span></p>
+                <div class="popup-ticket-count">
+                    <i class="fas fa-ticket-alt"></i> <span id="popup-ticket-count">0</span> Available Tickets
+                </div>
+                <div class="popup-tickets" id="popup-tickets-list">
+                    <!-- Tickets will be populated by JavaScript -->
+                </div>
             </div>
         </div>
     </div>
@@ -885,6 +1241,324 @@
             }
 
             // Load the Google Sheets API
+            // Set up view toggling
+            const tableViewButton = document.getElementById('table-view-button');
+            const calendarViewButton = document.getElementById('calendar-view-button');
+            const tableView = document.getElementById('table-view');
+            const calendarView = document.getElementById('calendar-view');
+            
+            tableViewButton.addEventListener('click', function() {
+                tableView.classList.add('active');
+                calendarView.classList.remove('active');
+                tableViewButton.classList.add('active');
+                calendarViewButton.classList.remove('active');
+            });
+            
+            calendarViewButton.addEventListener('click', function() {
+                calendarView.classList.add('active');
+                tableView.classList.remove('active');
+                calendarViewButton.classList.add('active');
+                tableViewButton.classList.remove('active');
+                
+                // Generate the calendar if we haven't already
+                if (calendarView.getAttribute('data-initialized') !== 'true') {
+                    generateCalendar();
+                    calendarView.setAttribute('data-initialized', 'true');
+                }
+            });
+            
+            // Set up calendar navigation
+            const prevMonthButton = document.getElementById('prev-month');
+            const nextMonthButton = document.getElementById('next-month');
+            const currentMonthElement = document.getElementById('current-month');
+            
+            let currentDate = new Date();
+            let currentCalendarMonth = currentDate.getMonth();
+            let currentCalendarYear = currentDate.getFullYear();
+            
+            prevMonthButton.addEventListener('click', function() {
+                currentCalendarMonth--;
+                if (currentCalendarMonth < 0) {
+                    currentCalendarMonth = 11;
+                    currentCalendarYear--;
+                }
+                generateCalendar();
+            });
+            
+            nextMonthButton.addEventListener('click', function() {
+                currentCalendarMonth++;
+                if (currentCalendarMonth > 11) {
+                    currentCalendarMonth = 0;
+                    currentCalendarYear++;
+                }
+                generateCalendar();
+            });
+            
+            // Set up popup functionality
+            const popupOverlay = document.getElementById('popup-overlay');
+            const concertPopup = document.getElementById('concert-popup');
+            const popupClose = document.getElementById('popup-close');
+            
+            function openPopup(concert, date) {
+                document.getElementById('popup-concert-name').textContent = concert;
+                document.getElementById('popup-concert-date').textContent = date;
+                
+                // Find all tickets for this concert and date
+                const concertTickets = ticketData.filter(ticket => 
+                    ticket.concert === concert && ticket.date === date
+                );
+                
+                const ticketsList = document.getElementById('popup-tickets-list');
+                ticketsList.innerHTML = '';
+                
+                // Update ticket count
+                document.getElementById('popup-ticket-count').textContent = concertTickets.length;
+                
+                if (concertTickets.length === 0) {
+                    ticketsList.innerHTML = '<p>No tickets available for this date.</p>';
+                    return;
+                }
+                
+                // Create a table to display all tickets
+                const ticketsTable = document.createElement('table');
+                ticketsTable.className = 'popup-tickets-table';
+                
+                // Create table header
+                const tableHeader = document.createElement('thead');
+                tableHeader.innerHTML = `
+                    <tr>
+                        <th>Seat</th>
+                        <th>Sale Type</th>
+                        <th>List Price</th>
+                        <th>StubHub Price</th>
+                        <th>Action</th>
+                    </tr>
+                `;
+                ticketsTable.appendChild(tableHeader);
+                
+                // Create table body
+                const tableBody = document.createElement('tbody');
+                
+                // Sort tickets by price (lowest first)
+                const sortedTickets = [...concertTickets].sort((a, b) => {
+                    // Handle coming soon tickets
+                    if (a.isComingSoon) return 1;
+                    if (b.isComingSoon) return -1;
+                    
+                    // Extract numeric price value
+                    const priceA = parseFloat(a.listPrice.replace('$', '').replace(',', '')) || 0;
+                    const priceB = parseFloat(b.listPrice.replace('$', '').replace(',', '')) || 0;
+                    
+                    return priceA - priceB;
+                });
+                
+                // Add each ticket to the table
+                sortedTickets.forEach(ticket => {
+                    const row = document.createElement('tr');
+                    
+                    // Create badge for sale type
+                    let badgeClass = '';
+                    if (ticket.saleType.toLowerCase().includes('family')) {
+                        badgeClass = 'badge-family';
+                    } else if (ticket.saleType.toLowerCase().includes('stubhub')) {
+                        badgeClass = 'badge-stubhub';
+                    }
+                    
+                    // Format prices
+                    const listPrice = ticket.listPrice || '-';
+                    const stubhubPrice = ticket.stubhubPrice || '-';
+                    
+                    // Action button (or coming soon text)
+                    let actionHtml = '';
+                    if (ticket.isComingSoon) {
+                        actionHtml = '<span class="coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
+                    } else {
+                        actionHtml = `
+                            <a href="#" class="button inquiry-button" 
+                               data-seat="${ticket.seat}"
+                               data-concert="${ticket.concert}" 
+                               data-date="${ticket.date}" 
+                               data-price="${ticket.listPrice}">
+                                <i class="far fa-envelope"></i> Inquire
+                            </a>
+                        `;
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${ticket.seat}</td>
+                        <td><span class="badge ${badgeClass}">${ticket.saleType}</span></td>
+                        <td class="price">${listPrice}</td>
+                        <td class="price">${stubhubPrice}</td>
+                        <td>${actionHtml}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                ticketsTable.appendChild(tableBody);
+                ticketsList.appendChild(ticketsTable);
+                
+                // Add click handlers for the inquiry buttons
+                document.querySelectorAll('.popup-tickets .inquiry-button').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const concert = this.getAttribute('data-concert');
+                        const date = this.getAttribute('data-date');
+                        const seat = this.getAttribute('data-seat');
+                        const price = this.getAttribute('data-price');
+                        
+                        // Compose email
+                        const subject = `Ticket Inquiry: ${concert} - ${date} - Seat ${seat}`;
+                        const body = `Hello,\n\nI'm interested in purchasing tickets for:\n\nConcert: ${concert}\nDate: ${date}\nSeat: ${seat}\nListed Price: ${price}\n\nPlease let me know if these tickets are still available.\n\nThank you,\n`;
+                        
+                        // Open default email client
+                        window.location.href = `mailto:tickets@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    });
+                });
+                
+                popupOverlay.classList.add('active');
+                concertPopup.classList.add('active');
+            }
+            
+            function closePopup() {
+                popupOverlay.classList.remove('active');
+                concertPopup.classList.remove('active');
+            }
+            
+            popupClose.addEventListener('click', closePopup);
+            popupOverlay.addEventListener('click', closePopup);
+            
+            // Function to generate calendar
+            function generateCalendar() {
+                // Update month display
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                    'July', 'August', 'September', 'October', 'November', 'December'];
+                currentMonthElement.textContent = `${monthNames[currentCalendarMonth]} ${currentCalendarYear}`;
+                
+                // Get the first day of the month
+                const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1);
+                const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+                
+                // Get the last day of the month
+                const lastDay = new Date(currentCalendarYear, currentCalendarMonth + 1, 0);
+                const totalDays = lastDay.getDate();
+                
+                // Get today's date for highlighting
+                const today = new Date();
+                const isCurrentMonth = today.getMonth() === currentCalendarMonth && today.getFullYear() === currentCalendarYear;
+                const todayDate = today.getDate();
+                
+                const calendarGrid = document.querySelector('.calendar-grid');
+                calendarGrid.innerHTML = '';
+                
+                // Add day headers
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                dayNames.forEach(day => {
+                    const dayHeader = document.createElement('div');
+                    dayHeader.className = 'calendar-day-header';
+                    dayHeader.textContent = day;
+                    calendarGrid.appendChild(dayHeader);
+                });
+                
+                // Add empty cells for days before the first day of the month
+                for (let i = 0; i < startingDay; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'calendar-day empty';
+                    calendarGrid.appendChild(emptyDay);
+                }
+                
+                // Group concerts by date
+                const concertsByDate = {};
+                
+                if (ticketData && ticketData.length > 0) {
+                    ticketData.forEach(ticket => {
+                        if (!ticket.date) return;
+                        
+                        // Parse date in format MM/DD/YYYY
+                        const parts = ticket.date.split('/');
+                        if (parts.length !== 3) return;
+                        
+                        const month = parseInt(parts[0]) - 1; // 0-based
+                        const day = parseInt(parts[1]);
+                        const year = parseInt(parts[2]);
+                        
+                        // Skip if not in the current month/year
+                        if (month !== currentCalendarMonth || year !== currentCalendarYear) return;
+                        
+                        const dateKey = `${month+1}/${day}/${year}`;
+                        
+                        if (!concertsByDate[dateKey]) {
+                            concertsByDate[dateKey] = new Set();
+                        }
+                        
+                        concertsByDate[dateKey].add(ticket.concert);
+                    });
+                }
+                
+                // Add calendar days
+                for (let day = 1; day <= totalDays; day++) {
+                    const calendarDay = document.createElement('div');
+                    calendarDay.className = 'calendar-day';
+                    
+                    // Highlight today
+                    if (isCurrentMonth && day === todayDate) {
+                        calendarDay.classList.add('today');
+                    }
+                    
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'calendar-day-number';
+                    dayNumber.textContent = day;
+                    calendarDay.appendChild(dayNumber);
+                    
+                    // Add concert events for this day
+                    const dateKey = `${currentCalendarMonth+1}/${day}/${currentCalendarYear}`;
+                    
+                    if (concertsByDate[dateKey]) {
+                        const concerts = Array.from(concertsByDate[dateKey]);
+                        
+                        concerts.forEach(concert => {
+                            const concertEvent = document.createElement('div');
+                            concertEvent.className = 'concert-event';
+                            
+                            // Check if all tickets for this concert on this date are of a specific type
+                            const concertTickets = ticketData.filter(ticket => 
+                                ticket.concert === concert && ticket.date === dateKey
+                            );
+                            
+                            const allFamily = concertTickets.every(ticket => 
+                                ticket.saleType.toLowerCase().includes('family')
+                            );
+                            
+                            const allStubHub = concertTickets.every(ticket => 
+                                ticket.saleType.toLowerCase().includes('stubhub')
+                            );
+                            
+                            const allComingSoon = concertTickets.every(ticket => 
+                                ticket.isComingSoon
+                            );
+                            
+                            if (allFamily) {
+                                concertEvent.classList.add('family');
+                            } else if (allStubHub) {
+                                concertEvent.classList.add('stubhub');
+                            } else if (allComingSoon) {
+                                concertEvent.classList.add('coming-soon');
+                            }
+                            
+                            concertEvent.textContent = concert;
+                            concertEvent.addEventListener('click', function() {
+                                openPopup(concert, dateKey);
+                            });
+                            
+                            calendarDay.appendChild(concertEvent);
+                        });
+                    }
+                    
+                    calendarGrid.appendChild(calendarDay);
+                }
+            }
+            
+            // Load Google Sheets API
             loadGoogleSheetsAPI();
         });
 
@@ -998,6 +1672,12 @@
                 // Update the UI
                 populateFilters(ticketData);
                 applyFilters(); // This will call populateTable with filtered data
+                
+                // Generate calendar if calendar view is active
+                if (document.getElementById('calendar-view').classList.contains('active')) {
+                    generateCalendar();
+                    document.getElementById('calendar-view').setAttribute('data-initialized', 'true');
+                }
 
                 // Update last refresh time indicator
                 const lastRefresh = document.getElementById('last-refresh');
