@@ -192,6 +192,7 @@
         </tbody>
     </table>
 
+    <script src="process-env.js"></script>
     <script>
         // Load the Google Sheets API
         function loadGoogleSheetsAPI() {
@@ -206,10 +207,10 @@
         // Initialize the Google Sheets API client
         function initClient() {
             // Get API key from environment variable
-            const apiKey = process.env.GOOGLE_API_KEY || '';
+            const apiKey = window.ENV ? window.ENV.GOOGLE_API_KEY : '';
 
             if (!apiKey) {
-                console.error('API key not found. Make sure to set the GOOGLE_API_KEY environment variable in Netlify.');
+                console.error('API key not found. Make sure environment variables are configured correctly in Netlify.');
                 const tableBody = document.querySelector('#tickets-table tbody');
                 tableBody.innerHTML = '<tr><td colspan="7">Configuration error. Please contact the administrator.</td></tr>';
                 return;
