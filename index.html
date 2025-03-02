@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,37 +14,44 @@
             padding: 20px;
             color: #333;
         }
+
         h1 {
             color: #2c3e50;
             text-align: center;
             margin-bottom: 30px;
         }
+
         .filters {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
+
         .filter-group {
             margin-bottom: 15px;
         }
+
         label {
             margin-right: 10px;
             font-weight: bold;
         }
-        select, input {
+
+        select,
+        input {
             padding: 8px;
             border-radius: 4px;
             border: 1px solid #ddd;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
             position: relative;
         }
-        
+
         table.loading::after {
             content: "Loading...";
             position: absolute;
@@ -58,23 +66,29 @@
             font-size: 1.5rem;
             font-weight: bold;
         }
-        th, td {
+
+        th,
+        td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+
         th {
             background-color: #2c3e50;
             color: white;
             position: sticky;
             top: 0;
         }
+
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+
         tr:hover {
             background-color: #e9f7fe;
         }
+
         .button {
             display: inline-block;
             background-color: #3498db;
@@ -84,25 +98,41 @@
             border-radius: 4px;
             transition: background-color 0.3s;
         }
+
         .button:hover {
             background-color: #2980b9;
         }
+
+        .coming-soon {
+            display: inline-block;
+            background-color: #f39c12;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-style: italic;
+        }
+
         .concert-date {
             white-space: nowrap;
         }
+
         @media (max-width: 768px) {
             table {
                 font-size: 14px;
             }
-            th, td {
+
+            th,
+            td {
                 padding: 8px;
             }
         }
     </style>
 </head>
+
 <body>
     <h1>Available Concert Tickets</h1>
-    
+
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
         <div>
             <button id="refresh-button" class="button">Refresh Data</button>
@@ -111,7 +141,7 @@
             <small>Last updated: <span id="last-refresh">-</span></small>
         </div>
     </div>
-    
+
     <div class="filters">
         <div class="filter-group">
             <label for="concert-filter">Concert:</label>
@@ -120,7 +150,7 @@
                 <!-- Will be populated by JavaScript -->
             </select>
         </div>
-        
+
         <div class="filter-group">
             <label for="date-filter">Date:</label>
             <select id="date-filter">
@@ -128,22 +158,23 @@
                 <!-- Will be populated by JavaScript -->
             </select>
         </div>
-        
+
         <div class="filter-group">
             <label for="type-filter">Sale Type:</label>
             <select id="type-filter">
                 <option value="">All Types</option>
                 <option value="Family">Family</option>
                 <option value="StubHub">StubHub</option>
+                <option value="Coming Soon">Coming Soon</option>
             </select>
         </div>
-        
+
         <div class="filter-group">
             <label for="price-filter">Max Price:</label>
             <input type="number" id="price-filter" placeholder="Any price">
         </div>
     </div>
-    
+
     <table id="tickets-table">
         <thead>
             <tr>
@@ -160,7 +191,7 @@
             <!-- Table rows will be populated by JavaScript -->
         </tbody>
     </table>
-    
+
     <script>
         // Load the Google Sheets API
         function loadGoogleSheetsAPI() {
@@ -171,7 +202,7 @@
             };
             document.body.appendChild(script);
         }
-        
+
         // Initialize the Google Sheets API client
         function initClient() {
             gapi.client.init({
@@ -180,32 +211,32 @@
             }).then(() => {
                 // Load data immediately
                 fetchSheetData();
-                
+
                 // Set up periodic refresh (every 5 minutes)
                 setInterval(fetchSheetData, 5 * 60 * 1000);
             }).catch(error => {
                 console.error('Error initializing Google Sheets API', error);
             });
         }
-        
+
         // Variable to store the ticket data
         let ticketData = [];
-        
+
         // Function to populate the table
         function populateTable(data) {
             const tableBody = document.querySelector('#tickets-table tbody');
             tableBody.innerHTML = '';
-            
-            // Only show rows that have a list price
-            const filteredData = data.filter(ticket => ticket.listPrice);
-            
+
+            // Show rows that have either a list price OR sale type of "Coming Soon"
+            const filteredData = data.filter(ticket => ticket.listPrice || ticket.saleType === "Coming Soon");
+
             if (filteredData.length === 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = '<td colspan="7">No tickets available matching your criteria.</td>';
                 tableBody.appendChild(row);
                 return;
             }
-            
+
             filteredData.forEach(ticket => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -215,35 +246,37 @@
                     <td>${ticket.saleType}</td>
                     <td>${ticket.listPrice}</td>
                     <td>${ticket.stubhubPrice}</td>
-                    <td><a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}">Inquire</a></td>
+                    <td>${ticket.saleType === "Coming Soon" ?
+                        '<span class="coming-soon">Coming Soon</span>' :
+                        `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}">Inquire</a>`}</td>
                 `;
                 tableBody.appendChild(row);
             });
-            
+
             // Add event listeners for the inquiry buttons
             document.querySelectorAll('.inquiry-button').forEach(button => {
-                button.addEventListener('click', function(e) {
+                button.addEventListener('click', function (e) {
                     e.preventDefault();
                     const seat = this.getAttribute('data-seat');
                     const concert = this.getAttribute('data-concert');
                     const date = this.getAttribute('data-date');
                     const price = this.getAttribute('data-price');
-                    
+
                     // Compose email
                     const subject = `Ticket Inquiry: ${concert} - ${date} - Seat ${seat}`;
                     const body = `Hello,\n\nI'm interested in purchasing tickets for:\n\nConcert: ${concert}\nDate: ${date}\nSeat: ${seat}\nListed Price: ${price}\n\nPlease let me know if these tickets are still available.\n\nThank you,\n`;
-                    
+
                     // Open default email client
-                    window.location.href = `mailto:CosSunsetTickets@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    window.location.href = `mailto:YOUR_EMAIL@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                 });
             });
         }
-        
+
         // Function to populate filter dropdowns
         function populateFilters(data) {
             const concerts = [...new Set(data.map(ticket => ticket.concert))];
             const dates = [...new Set(data.map(ticket => ticket.date))];
-            
+
             const concertFilter = document.getElementById('concert-filter');
             concertFilter.innerHTML = '<option value="">All Concerts</option>';
             concerts.forEach(concert => {
@@ -252,7 +285,7 @@
                 option.textContent = concert;
                 concertFilter.appendChild(option);
             });
-            
+
             const dateFilter = document.getElementById('date-filter');
             dateFilter.innerHTML = '<option value="">All Dates</option>';
             dates.forEach(date => {
@@ -262,67 +295,67 @@
                 dateFilter.appendChild(option);
             });
         }
-        
+
         // Function to apply filters
         function applyFilters() {
             const concertValue = document.getElementById('concert-filter').value;
             const dateValue = document.getElementById('date-filter').value;
             const typeValue = document.getElementById('type-filter').value;
             const priceValue = document.getElementById('price-filter').value;
-            
+
             let filteredData = [...ticketData];
-            
+
             if (concertValue) {
                 filteredData = filteredData.filter(ticket => ticket.concert === concertValue);
             }
-            
+
             if (dateValue) {
                 filteredData = filteredData.filter(ticket => ticket.date === dateValue);
             }
-            
+
             if (typeValue) {
                 filteredData = filteredData.filter(ticket => ticket.saleType === typeValue);
             }
-            
+
             if (priceValue) {
                 filteredData = filteredData.filter(ticket => {
                     const price = parseFloat(ticket.listPrice.replace('$', ''));
                     return price <= parseFloat(priceValue);
                 });
             }
-            
+
             populateTable(filteredData);
         }
-        
+
         // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Add event listeners for filters
             document.getElementById('concert-filter').addEventListener('change', applyFilters);
             document.getElementById('date-filter').addEventListener('change', applyFilters);
             document.getElementById('type-filter').addEventListener('change', applyFilters);
             document.getElementById('price-filter').addEventListener('input', applyFilters);
-            
+
             // Add refresh button functionality (optional)
             const refreshButton = document.getElementById('refresh-button');
             if (refreshButton) {
                 refreshButton.addEventListener('click', fetchSheetData);
             }
-            
+
             // Load the Google Sheets API
             loadGoogleSheetsAPI();
         });
-        
+
         // Function to fetch data from Google Sheets
         async function fetchSheetData() {
             try {
                 // Show loading indicator (optional)
                 document.getElementById('tickets-table').classList.add('loading');
-                
+
                 const response = await gapi.client.sheets.spreadsheets.values.get({
                     spreadsheetId: '1B9sh2TR74yC1oBHTrTMSuBWRDYTroaRN3BYnLaeg0P0', // Your actual spreadsheet ID
                     range: '2025!A2:Q',  // Your sheet range
                 });
-                
+
                 const rows = response.result.values;
                 if (!rows || rows.length === 0) {
                     console.warn('No data found in spreadsheet');
@@ -331,40 +364,41 @@
                     populateFilters(ticketData);
                     return;
                 }
-                
+
                 // Map the spreadsheet columns to our data structure
                 // Column indices based on your spreadsheet:
                 // 0=Concert, 1=Date, 2=Seat, 3=Sale Type, 4=List Price, 5=StubHub Price
                 const tickets = rows.map(row => {
-                    // Only include rows that have a list price
                     const listPrice = row[4] ? row[4] : '';
-                    
-                    if (listPrice) {
+                    const saleType = row[3] || '';
+
+                    // Include rows that have either a list price OR are "Coming Soon"
+                    if (listPrice || saleType === "Coming Soon") {
                         return {
                             concert: row[0] || '',
                             date: row[1] || '',
                             seat: row[2] || '',
-                            saleType: row[3] || '',
+                            saleType: saleType,
                             listPrice: listPrice,
                             stubhubPrice: row[5] || ''
                         };
                     }
                     return null;
                 }).filter(ticket => ticket !== null);
-                
+
                 // Update the global ticket data
                 ticketData = tickets;
-                
+
                 // Update the UI
                 populateFilters(ticketData);
                 applyFilters(); // This will call populateTable with filtered data
-                
+
                 // Update last refresh time indicator (optional)
                 const lastRefresh = document.getElementById('last-refresh');
                 if (lastRefresh) {
                     lastRefresh.textContent = new Date().toLocaleTimeString();
                 }
-                
+
                 console.log('Data refreshed successfully');
             } catch (error) {
                 console.error('Error fetching data from Google Sheets:', error);
@@ -378,4 +412,5 @@
         }
     </script>
 </body>
+
 </html>
