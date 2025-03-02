@@ -175,7 +175,7 @@
         // Initialize the Google Sheets API client
         function initClient() {
             gapi.client.init({
-                apiKey: 'AIzaSyCZbu0gncL-Vl7Zv6iZd5MLhSvUZ0yNfec', // Your actual API key
+                apiKey: 'AIzaSyCZbu0gncL-Vl7Zv6iZd5MLhSvUZ0yNfec', // Replace with your actual API key
                 discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
             }).then(() => {
                 // Load data immediately
@@ -215,26 +215,18 @@
                     <td>${ticket.saleType}</td>
                     <td>${ticket.listPrice}</td>
                     <td>${ticket.stubhubPrice}</td>
-                    <td><a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}">Inquire</a></td>
+                    <td><a href="#" class="button" data-seat="${ticket.seat}">Inquire</a></td>
                 `;
                 tableBody.appendChild(row);
             });
             
             // Add event listeners for the inquiry buttons
-            document.querySelectorAll('.inquiry-button').forEach(button => {
+            document.querySelectorAll('.button').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const seat = this.getAttribute('data-seat');
-                    const concert = this.getAttribute('data-concert');
-                    const date = this.getAttribute('data-date');
-                    const price = this.getAttribute('data-price');
-                    
-                    // Compose email
-                    const subject = `Ticket Inquiry: ${concert} - ${date} - Seat ${seat}`;
-                    const body = `Hello,\n\nI'm interested in purchasing tickets for:\n\nConcert: ${concert}\nDate: ${date}\nSeat: ${seat}\nListed Price: ${price}\n\nPlease let me know if these tickets are still available.\n\nThank you,\n`;
-                    
-                    // Open default email client
-                    window.location.href = `mailto:CosSunsetTickets@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    alert(`Thank you for your interest in seat ${seat}. Please contact us to complete your purchase.`);
+                    // In a real app, this could open a contact form or modal
                 });
             });
         }
@@ -245,7 +237,6 @@
             const dates = [...new Set(data.map(ticket => ticket.date))];
             
             const concertFilter = document.getElementById('concert-filter');
-            concertFilter.innerHTML = '<option value="">All Concerts</option>';
             concerts.forEach(concert => {
                 const option = document.createElement('option');
                 option.value = concert;
@@ -254,7 +245,6 @@
             });
             
             const dateFilter = document.getElementById('date-filter');
-            dateFilter.innerHTML = '<option value="">All Dates</option>';
             dates.forEach(date => {
                 const option = document.createElement('option');
                 option.value = date;
@@ -319,8 +309,8 @@
                 document.getElementById('tickets-table').classList.add('loading');
                 
                 const response = await gapi.client.sheets.spreadsheets.values.get({
-                    spreadsheetId: '1B9sh2TR74yC1oBHTrTMSuBWRDYTroaRN3BYnLaeg0P0', // Your actual spreadsheet ID
-                    range: '2025!A2:Q',  // Your sheet range
+                    spreadsheetId: '1B9sh2TR74yC1oBHTrTMSuBWRDYTroaRN3BYnLaeg0P0', // Replace with your actual spreadsheet ID
+                    range: '2025!A2:Q',  // Adjust range based on your sheet structure
                 });
                 
                 const rows = response.result.values;
