@@ -206,7 +206,7 @@
         // Initialize the Google Sheets API client
         function initClient() {
             gapi.client.init({
-                apiKey: 'AIzaSyCZbu0gncL-Vl7Zv6iZd5MLhSvUZ0yNfec', // Your actual API key
+                apiKey: process.env.GOOGLE_API_KEY, // Your actual API key
                 discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
             }).then(() => {
                 // Load data immediately
