@@ -437,6 +437,11 @@
     </header>
 
     <div class="container">
+        <div id="local-dev-banner" style="display: none; margin-bottom: 20px; padding: 10px 15px; background-color: #fff3cd; color: #856404; border-radius: 8px; border-left: 4px solid #ffc107;">
+            <strong><i class="fas fa-info-circle"></i> Local Development Mode:</strong> 
+            Using keys from local-env.js. For API calls to work correctly, make sure you're serving this page from a web server (not opening it as a file).
+        </div>
+        
         <div class="action-bar">
             <div class="refresh-container">
                 <button id="refresh-button" class="button">
@@ -518,71 +523,150 @@
         </div>
     </footer>
 
+    <!-- Load environment variables first -->
     <script>
         // Check if we're in development mode (on localhost)
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             document.write('<script src="local-env.js"><\/script>');
+            console.log('Development environment detected. Loading local-env.js');
         } else {
             document.write('<script src="process-env.js"><\/script>');
+            console.log('Production environment detected. Loading process-env.js');
         }
     </script>
+    
+    <!-- Load Google API directly -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <!-- Also load the Sheets API explicitly -->
+    <script src="https://sheets.googleapis.com/$discovery/rest?version=v4"></script>
     <script>
         // Load the Google Sheets API
         function loadGoogleSheetsAPI() {
             // Add detailed console logging for debugging
             console.log('Starting Google Sheets API loading process...');
             
-            const script = document.createElement('script');
-            script.src = 'https://apis.google.com/js/api.js';
-            
-            script.onload = () => {
-                console.log('Google API base library loaded');
-                // Load the client library and the sheets API specifically
-                gapi.load('client', () => {
-                    console.log('Google client library loaded');
-                    loadSheetsAPI();
-                });
-            };
-            
-            script.onerror = (err) => {
-                console.error('Error loading Google API script:', err);
+            // Since we're loading the API directly, check if it's available
+            if (typeof gapi === 'undefined') {
+                console.error('Google API not available');
                 const tableBody = document.querySelector('#tickets-table tbody');
-                tableBody.innerHTML = '<tr><td colspan="7" class="error-message"><i class="fas fa-exclamation-triangle"></i> Error loading Google API. Please check your internet connection and try again.</td></tr>';
-            };
+                tableBody.innerHTML = '<tr><td colspan="7" class="error-message"><i class="fas fa-exclamation-triangle"></i> Error loading Google API. Please check your browser console for details.</td></tr>';
+                return;
+            }
             
-            document.body.appendChild(script);
+            console.log('Google API base library loaded');
+            
+            // Load the client library with a callback
+            gapi.load('client', function() {
+                console.log('Google client library loaded');
+                loadSheetsAPI();
+            });
         }
 
         // Load the Sheets API specifically
         function loadSheetsAPI() {
-            // Get API key from environment variable
-            const apiKey = window.ENV ? window.ENV.GOOGLE_API_KEY : '';
-
-            if (!apiKey) {
-                console.error('API key not found. Make sure environment variables are configured correctly.');
+            try {
+                // Get API key from environment variable
+                if (!window.ENV) {
+                    console.error('ENV object is not defined. Environment variables not loaded.');
+                    throw new Error('Configuration error: Environment variables not loaded.');
+                }
+                
+                const apiKey = window.ENV.GOOGLE_API_KEY;
+                const spreadsheetId = window.ENV.SPREADSHEET_ID;
+                
+                // For debugging, show more details in development
+                const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                if (isLocalDev) {
+                    console.log('Local environment variables:', {
+                        apiKey: apiKey ? 'Present (starts with ' + apiKey.substring(0, 5) + '...)' : 'Missing',
+                        spreadsheetId: spreadsheetId || 'Missing'
+                    });
+                }
+    
+                if (!apiKey) {
+                    console.error('API key not found in ENV object');
+                    throw new Error('API key not found in configuration');
+                }
+                
+                if (!spreadsheetId) {
+                    console.error('Spreadsheet ID not found in ENV object');
+                    throw new Error('Spreadsheet ID not found in configuration');
+                }
+                
+                console.log('Initializing Google Sheets API with key');
+                
+                // Make sure we have the client library loaded
+                if (!gapi.client) {
+                    console.error('Google client library not loaded');
+                    throw new Error('Google client library not loaded');
+                }
+                
+                // Initialize the client with a promise chain for clarity
+                gapi.client.init({
+                    apiKey: apiKey,
+                    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+                })
+                .then(function() {
+                    console.log('Google Sheets API initialized successfully');
+                    
+                    // Make sure sheets API is available
+                    if (!gapi.client.sheets) {
+                        console.error('Sheets API not available after initialization');
+                        throw new Error('Google Sheets API not loaded properly');
+                    }
+                    
+                    // Load data immediately
+                    fetchSheetData();
+    
+                    // Set up periodic refresh (every 5 minutes)
+                    setInterval(fetchSheetData, 5 * 60 * 1000);
+                })
+                .catch(function(error) {
+                    console.error('Error initializing Google Sheets API:', error);
+                    
+                    let errorMessage = '<i class="fas fa-exclamation-triangle"></i> ';
+                    
+                    if (isLocalDev) {
+                        // More detailed errors for development
+                        if (error.result && error.result.error) {
+                            const status = error.result.error.status;
+                            const message = error.result.error.message;
+                            
+                            if (status === 'PERMISSION_DENIED') {
+                                errorMessage += 'API KEY DOMAIN RESTRICTION: Your Google API key is restricted to specific domains. ' +
+                                    'For local development, you need a key without domain restrictions.';
+                            } else if (status === 'API_KEY_INVALID') {
+                                errorMessage += 'INVALID API KEY: The API key in local-env.js is invalid. Check for typos or get a new key.';
+                            } else {
+                                errorMessage += `API ERROR: ${message || status}`;
+                            }
+                        } else {
+                            errorMessage += `Error connecting to Google Sheets API: ${error.message || 'Unknown error'}`;
+                        }
+                    } else {
+                        // Generic message for production
+                        errorMessage += 'Error connecting to Google Sheets. Please try again later.';
+                    }
+                    
+                    const tableBody = document.querySelector('#tickets-table tbody');
+                    tableBody.innerHTML = `<tr><td colspan="7" class="error-message">${errorMessage}</td></tr>`;
+                });
+            } catch (error) {
+                console.error('Exception in loadSheetsAPI:', error);
+                
+                const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                let errorMessage = '<i class="fas fa-exclamation-triangle"></i> ';
+                
+                if (isLocalDev) {
+                    errorMessage += `Error loading Google Sheets API: ${error.message}. Check the console for more details.`;
+                } else {
+                    errorMessage += 'Error setting up data connection. Please try again later.';
+                }
+                
                 const tableBody = document.querySelector('#tickets-table tbody');
-                tableBody.innerHTML = '<tr><td colspan="7" class="error-message"><i class="fas fa-exclamation-triangle"></i> Configuration error. Please contact the administrator.</td></tr>';
-                return;
+                tableBody.innerHTML = `<tr><td colspan="7" class="error-message">${errorMessage}</td></tr>`;
             }
-            
-            console.log('Initializing Google Sheets API with key');
-            
-            // Initialize the client with the sheets API specifically
-            gapi.client.init({
-                apiKey: apiKey,
-                discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-            }).then(() => {
-                console.log('Google Sheets API initialized successfully');
-                // Load data immediately
-                fetchSheetData();
-
-                // Set up periodic refresh (every 5 minutes)
-                setInterval(fetchSheetData, 5 * 60 * 1000);
-            }).catch(error => {
-                console.error('Error initializing Google Sheets API:', error);
-                const tableBody = document.querySelector('#tickets-table tbody');
-                tableBody.innerHTML = '<tr><td colspan="7" class="error-message"><i class="fas fa-exclamation-triangle"></i> Error connecting to Google Sheets. Please try again later.</td></tr>';
-            });
         }
 
         // Variable to store the ticket data
@@ -721,6 +805,34 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function () {
+            // Check if we're in local development mode
+            const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            if (isLocalDev) {
+                // Show local development banner
+                const banner = document.getElementById('local-dev-banner');
+                if (banner) {
+                    banner.style.display = 'block';
+                }
+                
+                // Add more info if using file:// protocol
+                if (window.location.protocol === 'file:') {
+                    if (banner) {
+                        banner.style.backgroundColor = '#f8d7da';
+                        banner.style.color = '#721c24';
+                        banner.style.borderLeftColor = '#dc3545';
+                        banner.innerHTML = `<strong><i class="fas fa-exclamation-triangle"></i> Warning:</strong> 
+                            You're opening this page directly as a file. Google API calls won't work this way.
+                            Please use a local server like Live Server in VS Code or run "npx http-server" in your terminal.`;
+                    }
+                }
+                
+                console.log('Local development mode detected:', {
+                    hostname: window.location.hostname,
+                    protocol: window.location.protocol,
+                    usingServer: window.location.protocol !== 'file:'
+                });
+            }
+            
             // Add event listeners for filters
             document.getElementById('concert-filter').addEventListener('change', applyFilters);
             document.getElementById('date-filter').addEventListener('change', applyFilters);
@@ -746,6 +858,8 @@
 
         // Function to fetch data from Google Sheets
         async function fetchSheetData() {
+            const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            
             try {
                 // Show loading indicator
                 const table = document.getElementById('tickets-table');
@@ -753,20 +867,58 @@
                 
                 console.log('Attempting to fetch sheet data...');
                 
-                // Check if gapi and client are properly loaded
-                if (!gapi || !gapi.client || !gapi.client.sheets) {
-                    throw new Error('Google Sheets API not loaded properly. Check console for details.');
+                // Make very explicit checks for the Google API components
+                if (typeof gapi === 'undefined') {
+                    console.error('gapi is not defined');
+                    throw new Error('Google API (gapi) is not loaded');
                 }
                 
-                // Verify spreadsheet ID is available
-                if (!window.ENV || !window.ENV.SPREADSHEET_ID) {
+                if (typeof gapi.client === 'undefined') {
+                    console.error('gapi.client is not defined');
+                    throw new Error('Google client API is not loaded');
+                }
+                
+                if (typeof gapi.client.sheets === 'undefined') {
+                    console.error('gapi.client.sheets is not defined');
+                    throw new Error('Google Sheets API is not loaded');
+                }
+                
+                if (typeof gapi.client.sheets.spreadsheets === 'undefined') {
+                    console.error('gapi.client.sheets.spreadsheets is not defined');
+                    throw new Error('Google Sheets Spreadsheets API is not available');
+                }
+                
+                // Log API object structure for debugging
+                console.log('API availability check passed:', {
+                    gapi: 'loaded',
+                    client: 'loaded',
+                    sheets: 'loaded',
+                    spreadsheets: 'loaded',
+                    values: typeof gapi.client.sheets.spreadsheets.values
+                });
+                
+                // Verify environment variables
+                if (!window.ENV) {
+                    console.error('ENV object is not defined');
+                    throw new Error('Environment variables not loaded');
+                }
+                
+                const spreadsheetId = window.ENV.SPREADSHEET_ID;
+                if (!spreadsheetId) {
+                    console.error('Spreadsheet ID is missing in ENV object');
                     throw new Error('Spreadsheet ID is missing in configuration');
                 }
                 
-                console.log('Making API request to spreadsheet:', window.ENV.SPREADSHEET_ID);
+                // In local development, check if serving from a server
+                if (isLocalDev && window.location.protocol === 'file:') {
+                    console.warn('Local development detected using file:// protocol');
+                    throw new Error('Running from local file system. For API calls to work, serve the page using a local server instead of opening the file directly.');
+                }
+                
+                console.log('Making API request to spreadsheet:', spreadsheetId);
                 
                 const response = await gapi.client.sheets.spreadsheets.values.get({
-                    spreadsheetId: window.ENV.SPREADSHEET_ID,
+                    spreadsheetId: spreadsheetId,
                     range: '2025!A2:Q',  // Your sheet range
                 });
                 
@@ -828,15 +980,41 @@
                 // Show detailed error message for debugging
                 let errorMessage = '<i class="fas fa-exclamation-triangle"></i> ';
                 
-                if (error.message && error.message.includes('API not loaded')) {
+                if (error.message && error.message.includes('local file system')) {
+                    // Error specific to running from file:// instead of a server
+                    errorMessage += 'LOCAL DEVELOPMENT ERROR: You need to serve this page from a web server, not open it as a file. ';
+                    errorMessage += 'Try using a local server like Live Server in VS Code, or run "npx http-server" in the terminal.';
+                } else if (error.message && error.message.includes('API not loaded')) {
                     errorMessage += 'Google Sheets API not loaded properly. Please check your browser console for details.';
                 } else if (error.message && error.message.includes('Spreadsheet ID')) {
-                    errorMessage += 'Configuration error: Spreadsheet ID is missing. Please check your environment variables.';
+                    errorMessage += isLocalDev ? 
+                        'Configuration error: Spreadsheet ID is missing in local-env.js. Check this file to ensure SPREADSHEET_ID is set correctly.' :
+                        'Configuration error: Spreadsheet ID is missing. Please check your environment variables.';
                 } else if (error.result && error.result.error) {
                     // Handle Google API specific errors
-                    errorMessage += `API Error: ${error.result.error.message || 'Unknown Google API error'}`;
+                    if (isLocalDev) {
+                        // More detailed errors for local development
+                        const status = error.result.error.status;
+                        const message = error.result.error.message;
+                        
+                        if (status === 'PERMISSION_DENIED') {
+                            errorMessage += 'API KEY DOMAIN RESTRICTION: Your Google API key is restricted to specific domains. ';
+                            errorMessage += 'For local development, you need a key without domain restrictions or add localhost to allowed domains.';
+                        } else if (status === 'API_KEY_INVALID') {
+                            errorMessage += 'INVALID API KEY: The API key in local-env.js is invalid. Check for typos or get a new key.';
+                        } else if (message && message.includes('not found')) {
+                            errorMessage += 'SPREADSHEET NOT FOUND: The spreadsheet ID is invalid or you don\'t have access to it.';
+                        } else {
+                            errorMessage += `API ERROR: ${message || status}`;
+                        }
+                    } else {
+                        // Generic messages for production
+                        errorMessage += `API Error: ${error.result.error.message || 'Unknown Google API error'}`;
+                    }
                 } else {
-                    errorMessage += 'Error loading ticket data. Please try again later.';
+                    errorMessage += isLocalDev ? 
+                        `Error: ${error.message || 'Unknown error'} - Check browser console for details.` :
+                        'Error loading ticket data. Please try again later.';
                 }
                 
                 // Show error message to user
