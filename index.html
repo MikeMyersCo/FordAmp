@@ -4,56 +4,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concert Tickets Available</title>
+    <title>Premium Concert Tickets</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #3a0ca3;
+            --primary-light: #4895ef;
+            --secondary-color: #f72585;
+            --accent-color: #4cc9f0;
+            --dark-bg: #1a1a2e;
+            --light-bg: #f8f9fa;
+            --text-dark: #16213e;
+            --text-light: #ffffff;
+            --grey-light: #e9ecef;
+            --grey-dark: #6c757d;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --danger: #ef476f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Poppins', sans-serif;
             line-height: 1.6;
-            max-width: 1000px;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            background-image: linear-gradient(to right bottom, rgba(72, 149, 239, 0.05), rgba(58, 12, 163, 0.05));
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            color: #333;
+        }
+
+        header {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
         }
 
         h1 {
-            color: #2c3e50;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-light);
             text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--secondary-color);
+        }
+
+        .header-tagline {
+            font-size: 1.2rem;
+            font-weight: 300;
             margin-bottom: 30px;
+            text-align: center;
+            max-width: 600px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .action-bar {
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .refresh-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .last-update {
+            font-size: 0.85rem;
+            color: var(--grey-dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .last-update i {
+            margin-right: 5px;
+            color: var(--accent-color);
         }
 
         .filters {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
         }
 
         .filter-group {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
         }
 
         label {
-            margin-right: 10px;
-            font-weight: bold;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-size: 0.9rem;
         }
 
         select,
         input {
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--grey-light);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            background-color: white;
+            transition: all 0.2s ease;
+        }
+
+        select:focus,
+        input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            padding: 10px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .button.secondary {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .button.secondary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .table-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 40px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
             position: relative;
         }
 
         table.loading::after {
-            content: "Loading...";
+            content: "";
             position: absolute;
             top: 0;
             left: 0;
@@ -63,134 +243,270 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.2rem;
+            font-weight: 500;
+            z-index: 10;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 20;
+        }
+
+        table.loading .loading-spinner {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(72, 149, 239, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         th,
         td {
-            padding: 12px 15px;
+            padding: 16px 20px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
         }
 
         th {
-            background-color: #2c3e50;
+            background-color: var(--primary-color);
             color: white;
             position: sticky;
             top: 0;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            border-bottom: 1px solid var(--grey-light);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
         }
 
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: rgba(72, 149, 239, 0.03);
         }
 
         tr:hover {
-            background-color: #e9f7fe;
-        }
-
-        .button {
-            display: inline-block;
-            background-color: #3498db;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .button:hover {
-            background-color: #2980b9;
+            background-color: rgba(72, 149, 239, 0.08);
         }
 
         .coming-soon {
-            display: inline-block;
-            background-color: #f39c12;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--warning);
+            color: var(--text-dark);
+            padding: 8px 12px;
             border-radius: 4px;
-            font-style: italic;
+            font-weight: 500;
+            font-size: 0.85rem;
         }
 
         .concert-date {
             white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .price {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-family {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .badge-stubhub {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .no-results {
+            padding: 40px;
+            text-align: center;
+            color: var(--grey-dark);
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            background-color: rgba(239, 71, 111, 0.1);
+            color: var(--danger);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        footer {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 30px 0;
+            margin-top: 60px;
+            text-align: center;
+            font-size: 0.9rem;
         }
 
         @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .header-tagline {
+                font-size: 1rem;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
             table {
-                font-size: 14px;
+                font-size: 0.9rem;
             }
 
             th,
             td {
-                padding: 8px;
+                padding: 12px 10px;
+            }
+
+            th {
+                font-size: 0.8rem;
+            }
+
+            .table-container {
+                overflow-x: auto;
             }
         }
     </style>
 </head>
 
 <body>
-    <h1>Available Concert Tickets</h1>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <div>
-            <button id="refresh-button" class="button">Refresh Data</button>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>Premium Concert Tickets</h1>
+                <p class="header-tagline">Exclusive access to the best seats for your favorite artists</p>
+            </div>
         </div>
-        <div>
-            <small>Last updated: <span id="last-refresh">-</span></small>
+    </header>
+
+    <div class="container">
+        <div class="action-bar">
+            <div class="refresh-container">
+                <button id="refresh-button" class="button">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+            </div>
+            <div class="last-update">
+                <i class="far fa-clock"></i> Last updated: <span id="last-refresh">-</span>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="concert-filter">
+                    <i class="fas fa-music"></i> Concert
+                </label>
+                <select id="concert-filter">
+                    <option value="">All Concerts</option>
+                    <!-- Will be populated by JavaScript -->
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="date-filter">
+                    <i class="far fa-calendar-alt"></i> Date
+                </label>
+                <select id="date-filter">
+                    <option value="">All Dates</option>
+                    <!-- Will be populated by JavaScript -->
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="type-filter">
+                    <i class="fas fa-tag"></i> Sale Type
+                </label>
+                <select id="type-filter">
+                    <option value="">All Types</option>
+                    <option value="Family">Family</option>
+                    <option value="StubHub">StubHub</option>
+                    <option value="Coming Soon">Coming Soon</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="price-filter">
+                    <i class="fas fa-dollar-sign"></i> Max Price
+                </label>
+                <input type="number" id="price-filter" placeholder="Any price">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="tickets-table">
+                <thead>
+                    <tr>
+                        <th>Concert</th>
+                        <th>Date</th>
+                        <th>Seat</th>
+                        <th>Sale Type</th>
+                        <th>List Price</th>
+                        <th>StubHub Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
         </div>
     </div>
 
-    <div class="filters">
-        <div class="filter-group">
-            <label for="concert-filter">Concert:</label>
-            <select id="concert-filter">
-                <option value="">All Concerts</option>
-                <!-- Will be populated by JavaScript -->
-            </select>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Premium Concert Tickets. All rights reserved.</p>
         </div>
-
-        <div class="filter-group">
-            <label for="date-filter">Date:</label>
-            <select id="date-filter">
-                <option value="">All Dates</option>
-                <!-- Will be populated by JavaScript -->
-            </select>
-        </div>
-
-        <div class="filter-group">
-            <label for="type-filter">Sale Type:</label>
-            <select id="type-filter">
-                <option value="">All Types</option>
-                <option value="Family">Family</option>
-                <option value="StubHub">StubHub</option>
-                <option value="Coming Soon">Coming Soon</option>
-            </select>
-        </div>
-
-        <div class="filter-group">
-            <label for="price-filter">Max Price:</label>
-            <input type="number" id="price-filter" placeholder="Any price">
-        </div>
-    </div>
-
-    <table id="tickets-table">
-        <thead>
-            <tr>
-                <th>Concert</th>
-                <th>Date</th>
-                <th>Seat</th>
-                <th>Sale Type</th>
-                <th>List Price</th>
-                <th>StubHub Price</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Table rows will be populated by JavaScript -->
-        </tbody>
-    </table>
+    </footer>
 
     <script src="process-env.js"></script>
     <script>
@@ -210,9 +526,9 @@
             const apiKey = window.ENV ? window.ENV.GOOGLE_API_KEY : '';
 
             if (!apiKey) {
-                console.error('API key not found. Make sure environment variables are configured correctly in Netlify.');
+                console.error('API key not found. Make sure environment variables are configured correctly.');
                 const tableBody = document.querySelector('#tickets-table tbody');
-                tableBody.innerHTML = '<tr><td colspan="7">Configuration error. Please contact the administrator.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="7" class="error-message"><i class="fas fa-exclamation-triangle"></i> Configuration error. Please contact the administrator.</td></tr>';
                 return;
             }
 
@@ -233,6 +549,18 @@
         // Variable to store the ticket data
         let ticketData = [];
 
+        // Format price to ensure $ symbol and proper formatting
+        function formatPrice(price) {
+            if (!price) return '';
+            
+            // If price doesn't start with $, add it
+            if (!price.startsWith('$')) {
+                price = '$' + price;
+            }
+            
+            return price;
+        }
+
         // Function to populate the table
         function populateTable(data) {
             const tableBody = document.querySelector('#tickets-table tbody');
@@ -243,23 +571,34 @@
 
             if (filteredData.length === 0) {
                 const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="7">No tickets available matching your criteria.</td>';
+                row.innerHTML = '<td colspan="7" class="no-results"><i class="fas fa-search"></i> No tickets available matching your criteria.</td>';
                 tableBody.appendChild(row);
                 return;
             }
 
             filteredData.forEach(ticket => {
                 const row = document.createElement('tr');
+                
+                // Create the badge for sale type
+                let saleTypeBadge = '';
+                if (ticket.saleType.toLowerCase().includes('family')) {
+                    saleTypeBadge = `<span class="badge badge-family">Family</span>`;
+                } else if (ticket.saleType.toLowerCase().includes('stubhub')) {
+                    saleTypeBadge = `<span class="badge badge-stubhub">StubHub</span>`;
+                } else {
+                    saleTypeBadge = ticket.saleType;
+                }
+                
                 row.innerHTML = `
-                    <td>${ticket.concert}</td>
-                    <td class="concert-date">${ticket.date}</td>
+                    <td><strong>${ticket.concert}</strong></td>
+                    <td class="concert-date"><i class="far fa-calendar-alt"></i> ${ticket.date}</td>
                     <td>${ticket.seat}</td>
-                    <td>${ticket.saleType}</td>
-                    <td>${ticket.listPrice}</td>
-                    <td>${ticket.stubhubPrice}</td>
+                    <td>${saleTypeBadge}</td>
+                    <td class="price">${formatPrice(ticket.listPrice)}</td>
+                    <td class="price">${formatPrice(ticket.stubhubPrice)}</td>
                     <td>${ticket.isComingSoon ?
-                        '<span class="coming-soon">Coming Soon</span>' :
-                        `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}">Inquire</a>`}</td>
+                        '<span class="coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>' :
+                        `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}"><i class="far fa-envelope"></i> Inquire</a>`}</td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -278,15 +617,15 @@
                     const body = `Hello,\n\nI'm interested in purchasing tickets for:\n\nConcert: ${concert}\nDate: ${date}\nSeat: ${seat}\nListed Price: ${price}\n\nPlease let me know if these tickets are still available.\n\nThank you,\n`;
 
                     // Open default email client
-                    window.location.href = `mailto:YOUR_EMAIL@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    window.location.href = `mailto:tickets@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                 });
             });
         }
 
         // Function to populate filter dropdowns
         function populateFilters(data) {
-            const concerts = [...new Set(data.map(ticket => ticket.concert))];
-            const dates = [...new Set(data.map(ticket => ticket.date))];
+            const concerts = [...new Set(data.map(ticket => ticket.concert))].sort();
+            const dates = [...new Set(data.map(ticket => ticket.date))].sort();
 
             const concertFilter = document.getElementById('concert-filter');
             concertFilter.innerHTML = '<option value="">All Concerts</option>';
@@ -327,13 +666,14 @@
             if (typeValue === "Coming Soon") {
                 filteredData = filteredData.filter(ticket => ticket.isComingSoon);
             } else if (typeValue) {
-                filteredData = filteredData.filter(ticket => ticket.saleType === typeValue);
+                filteredData = filteredData.filter(ticket => ticket.saleType.toLowerCase().includes(typeValue.toLowerCase()));
             }
 
             if (priceValue) {
                 filteredData = filteredData.filter(ticket => {
-                    const price = parseFloat(ticket.listPrice.replace('$', ''));
-                    return price <= parseFloat(priceValue);
+                    if (!ticket.listPrice) return false;
+                    const price = parseFloat(ticket.listPrice.replace('$', '').replace(',', ''));
+                    return !isNaN(price) && price <= parseFloat(priceValue);
                 });
             }
 
@@ -348,7 +688,7 @@
             document.getElementById('type-filter').addEventListener('change', applyFilters);
             document.getElementById('price-filter').addEventListener('input', applyFilters);
 
-            // Add refresh button functionality (optional)
+            // Add refresh button functionality
             const refreshButton = document.getElementById('refresh-button');
             if (refreshButton) {
                 refreshButton.addEventListener('click', fetchSheetData);
@@ -361,8 +701,9 @@
         // Function to fetch data from Google Sheets
         async function fetchSheetData() {
             try {
-                // Show loading indicator (optional)
-                document.getElementById('tickets-table').classList.add('loading');
+                // Show loading indicator
+                const table = document.getElementById('tickets-table');
+                table.classList.add('loading');
 
                 const response = await gapi.client.sheets.spreadsheets.values.get({
                     spreadsheetId: window.ENV.SPREADSHEET_ID,
@@ -412,7 +753,7 @@
                 populateFilters(ticketData);
                 applyFilters(); // This will call populateTable with filtered data
 
-                // Update last refresh time indicator (optional)
+                // Update last refresh time indicator
                 const lastRefresh = document.getElementById('last-refresh');
                 if (lastRefresh) {
                     lastRefresh.textContent = new Date().toLocaleTimeString();
@@ -421,11 +762,11 @@
                 console.log('Data refreshed successfully');
             } catch (error) {
                 console.error('Error fetching data from Google Sheets:', error);
-                // Show error message to user (optional)
+                // Show error message to user
                 const tableBody = document.querySelector('#tickets-table tbody');
-                tableBody.innerHTML = '<tr><td colspan="7">Error loading ticket data. Please try again later.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="7" class="error-message"><i class="fas fa-exclamation-triangle"></i> Error loading ticket data. Please try again later.</td></tr>';
             } finally {
-                // Hide loading indicator (optional)
+                // Hide loading indicator
                 document.getElementById('tickets-table').classList.remove('loading');
             }
         }
