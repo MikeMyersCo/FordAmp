@@ -324,6 +324,43 @@
             position: relative;
         }
         
+        /* Horizontal scroll indicator */
+        .scroll-indicator {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 30px 0 0 30px;
+            animation: pulse 1.5s infinite ease-in-out;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        /* Only show the scroll indicator on smaller screens */
+        @media (max-width: 992px) {
+            .scroll-indicator {
+                display: block;
+            }
+            
+            /* Hide after the user has scrolled */
+            .table-container.scrolled .scroll-indicator {
+                display: none;
+            }
+        }
+        
         .venue-watermark {
             position: fixed;
             bottom: -50px;
@@ -1062,6 +1099,12 @@
 
         <!-- Table View -->
         <div id="table-view" class="table-container view-container active">
+            <!-- Scroll indicator -->
+            <div class="scroll-indicator">
+                <i class="fas fa-angle-double-right"></i>
+                <span style="margin-left: 5px; font-size: 12px;">Scroll for more</span>
+            </div>
+            
             <table id="tickets-table">
                 <thead>
                     <tr>
@@ -1577,7 +1620,20 @@
                 
                 // Re-enable refresh button in table view
                 document.getElementById('refresh-button').disabled = false;
+                
+                // Reset table scroll indicator
+                tableView.classList.remove('scrolled');
             });
+            
+            // Handle horizontal scroll detection
+            if (tableView) {
+                tableView.addEventListener('scroll', function() {
+                    // Mark as scrolled after user has scrolled horizontally
+                    if (this.scrollLeft > 10) {
+                        this.classList.add('scrolled');
+                    }
+                });
+            }
             
             calendarViewButton.addEventListener('click', function() {
                 calendarView.classList.add('active');
