@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="./ford_ampitheater.jpeg" as="image">
     <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
@@ -65,11 +66,22 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url('https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80');
+            background-image: url('./ford_ampitheater.jpeg');
             background-size: cover;
             background-position: center;
-            opacity: 0.15;
+            opacity: 0.25;
             z-index: 0;
+            animation: slow-pan 60s ease-in-out infinite alternate;
+            background-position: center 25%;
+        }
+        
+        @keyframes slow-pan {
+            0% {
+                background-position: center 25%;
+            }
+            100% {
+                background-position: center 75%;
+            }
         }
 
         .header-content {
@@ -278,6 +290,28 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .venue-watermark {
+            position: fixed;
+            bottom: -50px;
+            right: -50px;
+            width: 300px;
+            height: 300px;
+            background-image: url('./ford_ampitheater.jpeg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            opacity: 0.08;
+            z-index: -1;
+            filter: contrast(1.2) saturate(1.5);
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        body:hover .venue-watermark {
+            opacity: 0.12;
         }
         
         /* Calendar Styles */
@@ -390,6 +424,22 @@
             display: none;
             max-height: 90vh;
             overflow: hidden;
+            position: relative;
+        }
+        
+        .concert-popup::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background-image: url('./ford_ampitheater.jpeg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
         }
         
         .concert-popup.active {
@@ -421,9 +471,17 @@
             cursor: pointer;
         }
         
+        .popup-content {
+            padding-top: 80px;
+            position: relative;
+            margin-top: 40px;
+        }
+        
         .popup-content h3 {
             margin-top: 0;
             color: var(--primary-color);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-size: 1.8rem;
         }
         
         .popup-content p {
@@ -771,6 +829,8 @@
         </div>
     </header>
 
+    <div class="venue-watermark"></div>
+    
     <div class="container">
         <div id="local-dev-banner" style="display: none; margin-bottom: 20px; padding: 10px 15px; background-color: #fff3cd; color: #856404; border-radius: 8px; border-left: 4px solid #ffc107;">
             <strong><i class="fas fa-info-circle"></i> Local Development Mode:</strong> 
