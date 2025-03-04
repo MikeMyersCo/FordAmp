@@ -208,6 +208,21 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
+        
+        .button:disabled {
+            background-color: var(--grey-dark);
+            color: var(--grey-light);
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .button:disabled:hover {
+            background-color: var(--grey-dark);
+            transform: none;
+            box-shadow: none;
+        }
 
         .button.secondary {
             background-color: white;
@@ -1252,6 +1267,9 @@
                 calendarView.classList.remove('active');
                 tableViewButton.classList.add('active');
                 calendarViewButton.classList.remove('active');
+                
+                // Re-enable refresh button in table view
+                document.getElementById('refresh-button').disabled = false;
             });
             
             calendarViewButton.addEventListener('click', function() {
@@ -1259,6 +1277,9 @@
                 tableView.classList.remove('active');
                 calendarViewButton.classList.add('active');
                 tableViewButton.classList.remove('active');
+                
+                // Disable refresh button in calendar view
+                document.getElementById('refresh-button').disabled = true;
                 
                 // Generate the calendar if we haven't already
                 if (calendarView.getAttribute('data-initialized') !== 'true') {
