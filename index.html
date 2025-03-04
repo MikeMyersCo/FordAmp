@@ -1437,8 +1437,10 @@
             const closeLanding = document.getElementById('close-landing');
             const mobileCalendarButton = document.getElementById('mobile-calendar-button');
             const mobileTableButton = document.getElementById('mobile-table-button');
-            const calendarViewButton = document.getElementById('calendar-view-button');
-            const tableViewButton = document.getElementById('table-view-button');
+            
+            // We'll get these references later when appropriate
+            let calendarViewButton; 
+            let tableViewButton;
             
             // Check if user has dismissed the landing page before
             const hasVisitedBefore = localStorage.getItem('hasVisitedBefore');
@@ -1460,31 +1462,26 @@
             closeLanding.addEventListener('click', closeMobileLanding);
             
             mobileCalendarButton.addEventListener('click', function() {
-                calendarViewButton.click();
+                // Get reference when needed to avoid duplicate declaration
+                calendarViewButton = document.getElementById('calendar-view-button');
+                if (calendarViewButton) {
+                    calendarViewButton.click();
+                }
                 closeMobileLanding();
             });
             
             mobileTableButton.addEventListener('click', function() {
-                tableViewButton.click();
+                // Get reference when needed to avoid duplicate declaration
+                tableViewButton = document.getElementById('table-view-button');
+                if (tableViewButton) {
+                    tableViewButton.click();
+                }
                 closeMobileLanding();
             });
             
             // Mobile menu button to reopen the landing page
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             mobileMenuButton.addEventListener('click', showMobileLanding);
-            
-            // On desktop, always hide the landing page
-            // On mobile, only show if it's their first visit
-            if (window.innerWidth > 768) {
-                // Always hide on desktop
-                closeMobileLanding();
-            } else if (hasVisitedBefore) {
-                // Hide on mobile if they've been here before
-                closeMobileLanding();
-            } else {
-                // First time on mobile, show the landing page
-                showMobileLanding();
-            }
             
             // Check if we're in local development mode or accessing via file protocol
             const isFileProtocol = window.location.protocol === 'file:';
@@ -1559,6 +1556,18 @@
             const calendarViewButton = document.getElementById('calendar-view-button');
             const tableView = document.getElementById('table-view');
             const calendarView = document.getElementById('calendar-view');
+            
+            // Mobile landing page visibility management (now that view buttons are available)
+            if (window.innerWidth > 768) {
+                // Always hide on desktop
+                closeMobileLanding();
+            } else if (hasVisitedBefore) {
+                // Hide on mobile if they've been here before
+                closeMobileLanding();
+            } else {
+                // First time on mobile, show the landing page
+                showMobileLanding();
+            }
             
             tableViewButton.addEventListener('click', function() {
                 tableView.classList.add('active');
