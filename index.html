@@ -341,6 +341,13 @@
             display: flex;
             align-items: center;
             font-weight: 500;
+            pointer-events: none; /* Allow taps to pass through */
+            -webkit-tap-highlight-color: transparent; /* No highlight on tap */
+        }
+        
+        /* To handle overflow detection */
+        .table-container.needs-scroll .scroll-indicator {
+            display: flex !important;
         }
         
         @keyframes pulse {
@@ -352,12 +359,28 @@
         /* Only show the scroll indicator on smaller screens */
         @media (max-width: 992px) {
             .scroll-indicator {
-                display: block;
+                /* Changed from 'block' to 'flex' to match the display: flex in main definition */
+                display: flex; 
             }
             
             /* Hide after the user has scrolled */
             .table-container.scrolled .scroll-indicator {
                 display: none;
+            }
+        }
+        
+        /* Specific override for mobile devices */
+        @media (max-width: 767px) {
+            .scroll-indicator {
+                display: flex !important; /* Force display on mobile */
+                right: 0;
+                padding: 8px 12px;
+                z-index: 100; /* Ensure it's above other elements */
+            }
+            
+            /* Only hide when explicitly marked as scrolled */
+            .table-container.scrolled .scroll-indicator {
+                display: none !important;
             }
         }
         
@@ -1625,11 +1648,51 @@
                 tableView.classList.remove('scrolled');
             });
             
-            // Handle horizontal scroll detection
+            // Handle horizontal scroll detection for all devices including iPhone
             if (tableView) {
+                // Mark the table as horizontally scrollable for mobile devices
+                const checkTableOverflow = function() {
+                    // Get the table element
+                    const table = document.getElementById('tickets-table');
+                    if (table && table.offsetWidth > tableView.offsetWidth) {
+                        // Table is wider than its container - scrolling needed
+                        tableView.classList.add('needs-scroll');
+                    } else {
+                        // No scrolling needed
+                        tableView.classList.remove('needs-scroll');
+                        tableView.classList.add('scrolled'); // Hide the indicator if no scrolling needed
+                    }
+                };
+                
+                // Check on load and whenever data changes
+                window.addEventListener('load', checkTableOverflow);
+                window.addEventListener('resize', checkTableOverflow);
+                
+                // Re-check overflow when table data is populated
+                const observeTableChanges = new MutationObserver(checkTableOverflow);
+                observeTableChanges.observe(document.getElementById('tickets-table'), { 
+                    childList: true, 
+                    subtree: true 
+                });
+                
+                // Listen for scroll events
                 tableView.addEventListener('scroll', function() {
                     // Mark as scrolled after user has scrolled horizontally
                     if (this.scrollLeft > 10) {
+                        this.classList.add('scrolled');
+                    }
+                });
+                
+                // For touch devices (iPhone/iPad)
+                let touchStartX = 0;
+                tableView.addEventListener('touchstart', function(e) {
+                    touchStartX = e.touches[0].clientX;
+                });
+                
+                tableView.addEventListener('touchmove', function(e) {
+                    const touchMoveX = e.touches[0].clientX;
+                    // If swiped left significantly
+                    if (touchStartX - touchMoveX > 30) {
                         this.classList.add('scrolled');
                     }
                 });
