@@ -647,6 +647,13 @@
         .badge-stubhub {
             background-color: var(--primary-light);
             color: white;
+            transition: all 0.2s ease;
+        }
+        
+        a.badge-stubhub:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .no-results {
@@ -1066,6 +1073,18 @@
 
             return price;
         }
+        
+        // Generate StubHub URL for ticket search based on seat information
+        function generateStubHubUrl(concert, seat) {
+            // Clean up and normalize the concert name for the search query
+            const cleanConcert = concert.trim();
+            
+            // StubHub uses a simpler search URL format
+            // We'll use their main search endpoint which should find any event
+            const stubHubUrl = `https://www.stubhub.com/search?q=${encodeURIComponent(cleanConcert)}`;
+            
+            return stubHubUrl;
+        }
 
         // Function to populate the table
         function populateTable(data) {
@@ -1090,7 +1109,9 @@
                 if (ticket.saleType.toLowerCase().includes('family')) {
                     saleTypeBadge = `<span class="badge badge-family">Family</span>`;
                 } else if (ticket.saleType.toLowerCase().includes('stubhub')) {
-                    saleTypeBadge = `<span class="badge badge-stubhub">StubHub</span>`;
+                    // Create clickable StubHub badge that opens search in new tab
+                    const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
+                    saleTypeBadge = `<a href="${stubhubUrl}" target="_blank" class="badge badge-stubhub" style="text-decoration: none;">StubHub <i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i></a>`;
                 } else {
                     saleTypeBadge = ticket.saleType;
                 }
@@ -1377,12 +1398,16 @@
                 sortedTickets.forEach(ticket => {
                     const row = document.createElement('tr');
                     
-                    // Create badge for sale type
-                    let badgeClass = '';
+                    // Create badge for sale type and content
+                    let saleTypeHtml = '';
                     if (ticket.saleType.toLowerCase().includes('family')) {
-                        badgeClass = 'badge-family';
+                        saleTypeHtml = `<span class="badge badge-family">Family</span>`;
                     } else if (ticket.saleType.toLowerCase().includes('stubhub')) {
-                        badgeClass = 'badge-stubhub';
+                        // Create clickable StubHub badge that opens search in new tab
+                        const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
+                        saleTypeHtml = `<a href="${stubhubUrl}" target="_blank" class="badge badge-stubhub" style="text-decoration: none;">StubHub <i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i></a>`;
+                    } else {
+                        saleTypeHtml = `<span class="badge">${ticket.saleType}</span>`;
                     }
                     
                     // Format prices
@@ -1407,7 +1432,7 @@
                     
                     row.innerHTML = `
                         <td>${ticket.seat}</td>
-                        <td><span class="badge ${badgeClass}">${ticket.saleType}</span></td>
+                        <td>${saleTypeHtml}</td>
                         <td class="price">${listPrice}</td>
                         <td class="price">${stubhubPrice}</td>
                         <td>${actionHtml}</td>
