@@ -1134,10 +1134,10 @@
                         <th>Concert</th>
                         <th>Date</th>
                         <th>Seat</th>
-                        <th>Sale Type</th>
                         <th>List Price</th>
                         <th>StubHub Price</th>
                         <th>Action</th>
+                        <th>Compare StubHub</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1405,16 +1405,20 @@
                     saleTypeBadge = ticket.saleType;
                 }
 
+                // Generate StubHub button (moved to last column)
+                const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
+                const stubhubButton = `<a href="${stubhubUrl}" target="_blank" class="button secondary" style="font-size: 0.85rem;"><i class="fas fa-external-link-alt"></i> Compare StubHub</a>`;
+                
                 row.innerHTML = `
                     <td><strong>${ticket.concert}</strong></td>
                     <td class="concert-date"><i class="far fa-calendar-alt"></i> ${ticket.date}</td>
                     <td>${ticket.seat}</td>
-                    <td>${saleTypeBadge}</td>
                     <td class="price">${formatPrice(ticket.listPrice)}</td>
                     <td class="price">${formatPrice(ticket.stubhubPrice)}</td>
                     <td>${ticket.isComingSoon ?
                         '<span class="coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>' :
                         `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}"><i class="far fa-envelope"></i> Inquire</a>`}</td>
+                    <td>${ticket.isComingSoon ? '' : stubhubButton}</td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -1775,10 +1779,10 @@
                 tableHeader.innerHTML = `
                     <tr>
                         <th>Seat</th>
-                        <th>Sale Type</th>
                         <th>List Price</th>
                         <th>StubHub Price</th>
                         <th>Action</th>
+                        <th>Compare StubHub</th>
                     </tr>
                 `;
                 ticketsTable.appendChild(tableHeader);
@@ -1835,12 +1839,16 @@
                         `;
                     }
                     
+                    // Create StubHub button
+                    const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
+                    const stubhubButton = `<a href="${stubhubUrl}" target="_blank" class="button secondary" style="font-size: 0.85rem;"><i class="fas fa-external-link-alt"></i> Compare StubHub</a>`;
+                    
                     row.innerHTML = `
                         <td>${ticket.seat}</td>
-                        <td>${saleTypeHtml}</td>
                         <td class="price">${listPrice}</td>
                         <td class="price">${stubhubPrice}</td>
                         <td>${actionHtml}</td>
+                        <td>${ticket.isComingSoon ? '' : stubhubButton}</td>
                     `;
                     
                     tableBody.appendChild(row);
