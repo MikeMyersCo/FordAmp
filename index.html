@@ -772,7 +772,7 @@
 
         /* Mobile Landing Page */
         .mobile-landing {
-            display: none;
+            display: none; /* Hidden by default */
             position: fixed;
             top: 0;
             left: 0;
@@ -787,6 +787,11 @@
             background-size: cover;
             background-position: center;
             overflow: auto;
+            pointer-events: none; /* No interaction when hidden */
+        }
+        
+        .mobile-landing.active {
+            pointer-events: auto; /* Enable interaction when visible */
         }
         
         .mobile-landing::before {
@@ -861,11 +866,8 @@
         
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
-            .mobile-landing {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+            /* Mobile landing page will be shown/hidden via JavaScript, 
+               not automatically by CSS to prevent issues */
             
             h1 {
                 font-size: 2rem;
@@ -1441,8 +1443,15 @@
             // Check if user has dismissed the landing page before
             const hasVisitedBefore = localStorage.getItem('hasVisitedBefore');
             
+            // Function to show mobile landing page
+            function showMobileLanding() {
+                mobileLanding.classList.add('active');
+                mobileLanding.style.display = 'flex';
+            }
+            
             // Function to close the mobile landing page
             function closeMobileLanding() {
+                mobileLanding.classList.remove('active');
                 mobileLanding.style.display = 'none';
                 localStorage.setItem('hasVisitedBefore', 'true');
             }
@@ -1462,13 +1471,19 @@
             
             // Mobile menu button to reopen the landing page
             const mobileMenuButton = document.getElementById('mobile-menu-button');
-            mobileMenuButton.addEventListener('click', function() {
-                mobileLanding.style.display = 'flex';
-            });
+            mobileMenuButton.addEventListener('click', showMobileLanding);
             
-            // If the user has visited before and is on desktop, don't show the landing page
-            if (hasVisitedBefore) {
-                mobileLanding.style.display = 'none';
+            // On desktop, always hide the landing page
+            // On mobile, only show if it's their first visit
+            if (window.innerWidth > 768) {
+                // Always hide on desktop
+                closeMobileLanding();
+            } else if (hasVisitedBefore) {
+                // Hide on mobile if they've been here before
+                closeMobileLanding();
+            } else {
+                // First time on mobile, show the landing page
+                showMobileLanding();
             }
             
             // Check if we're in local development mode or accessing via file protocol
