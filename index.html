@@ -1198,8 +1198,8 @@
                 <i class="fas fa-table"></i> List View
             </a>
             
-            <a href="mailto:cosSunsetTickets@Gmail.com" class="button secondary">
-                <i class="fas fa-envelope"></i> Contact Us
+            <a href="sms:719-649-5320" class="button secondary">
+                <i class="fas fa-sms"></i> Text Us
             </a>
             
             <div id="close-landing" class="close-landing">
@@ -1656,7 +1656,7 @@
                             '' :
                             ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) ?
                               '' : // Don't show inquiry button for sold tickets
-                              `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}"><i class="far fa-envelope"></i> Inquire</a>`
+                              `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}"><i class="fas fa-sms"></i> Text Me</a>`
                         }</td>
                     `;
                     tableBody.appendChild(row);
@@ -1676,8 +1676,9 @@
                     const subject = `Ticket Inquiry: ${concert} - ${date} - Seat ${seat}`;
                     const body = `Hello,\n\nI'm interested in purchasing tickets for:\n\nConcert: ${concert}\nDate: ${date}\nSeat: ${seat}\nListed Price: ${price}\n\nPlease let me know if these tickets are still available.\n\nThank you,\n`;
 
-                    // Open default email client
-                    window.location.href = `mailto:cosSunsetTickets@Gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    // Open SMS with pre-filled message
+                    const smsBody = `Ticket Inquiry: ${concert} - ${date} - Seat ${seat} - Price: ${price}`;
+                    window.location.href = `sms:719-649-5320?body=${encodeURIComponent(smsBody)}`;
                 });
             });
         }
@@ -2088,7 +2089,7 @@
                                data-concert="${ticket.concert}" 
                                data-date="${ticket.date}" 
                                data-price="${ticket.listPrice}">
-                                <i class="far fa-envelope"></i> Inquire
+                                <i class="fas fa-sms"></i> Text Me
                             </a>
                         `;
                     }
@@ -2129,8 +2130,9 @@
                         const subject = `Ticket Inquiry: ${concert} - ${date} - Seat ${seat}`;
                         const body = `Hello,\n\nI'm interested in purchasing tickets for:\n\nConcert: ${concert}\nDate: ${date}\nSeat: ${seat}\nListed Price: ${price}\n\nPlease let me know if these tickets are still available.\n\nThank you,\n`;
                         
-                        // Open default email client
-                        window.location.href = `mailto:cosSunsetTickets@Gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                        // Open SMS with pre-filled message
+                        const smsBody = `Ticket Inquiry: ${concert} - ${date} - Seat ${seat} - Price: ${price}`;
+                        window.location.href = `sms:719-649-5320?body=${encodeURIComponent(smsBody)}`;
                     });
                 });
                 
