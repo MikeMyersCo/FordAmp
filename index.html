@@ -866,8 +866,11 @@
         }
         
         .sold-overlay .seat-number {
-            opacity: 0.6;
-            font-weight: 500;
+            animation: fade-seat 4s infinite ease-in-out;
+            font-weight: 600;
+            color: #333;
+            position: relative;
+            z-index: 1;
         }
         
         .sold-overlay::after {
@@ -878,26 +881,40 @@
             transform: translate(-50%, -50%) rotate(-30deg);
             color: #ef476f;
             font-weight: 800;
-            font-size: 1.2em;
+            font-size: 1.1em;
             text-shadow: 
-                -1px -1px 0 white,
-                1px -1px 0 white,
-                -1px 1px 0 white,
-                1px 1px 0 white;
+                -1.5px -1.5px 0 rgba(255, 255, 255, 0.9),
+                1.5px -1.5px 0 rgba(255, 255, 255, 0.9),
+                -1.5px 1.5px 0 rgba(255, 255, 255, 0.9),
+                1.5px 1.5px 0 rgba(255, 255, 255, 0.9);
             letter-spacing: 1px;
             white-space: nowrap;
             pointer-events: none;
-            animation: sold-blink 2s infinite alternate;
+            animation: fade-sold 4s infinite ease-in-out;
+            z-index: 2;
         }
         
-        @keyframes sold-blink {
-            0% {
-                opacity: 0.7;
-                transform: translate(-50%, -50%) rotate(-30deg) scale(1);
+        @keyframes fade-seat {
+            0%, 25% {
+                opacity: 0.3;
             }
-            100% {
+            45%, 55% {
                 opacity: 1;
-                transform: translate(-50%, -50%) rotate(-30deg) scale(1.1);
+            }
+            75%, 100% {
+                opacity: 0.3;
+            }
+        }
+        
+        @keyframes fade-sold {
+            0%, 25% {
+                opacity: 1;
+            }
+            45%, 55% {
+                opacity: 0.1;
+            }
+            75%, 100% {
+                opacity: 1;
             }
         }
         
@@ -1609,10 +1626,8 @@
                     const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
                     const stubhubButton = `<a href="${stubhubUrl}" target="_blank" class="button secondary" style="font-size: 0.85rem;"><i class="fas fa-external-link-alt"></i> Compare StubHub</a>`;
                     
-                    // Handle SOLD indicators for Family/Direct tickets without prices
-                    const priceDisplay = (!ticket.listPrice && (ticket.isFamily || ticket.isDirect)) 
-                        ? '<span class="badge sold-badge"><i class="fas fa-check-circle"></i> SOLD</span>' 
-                        : formatPrice(ticket.listPrice);
+                    // Just display the price if available, don't show SOLD indicator here
+                    const priceDisplay = formatPrice(ticket.listPrice);
                     
                     // Create StubHub/AXS link if price is available
                     let stubhubDisplay = '';
@@ -2049,10 +2064,8 @@
                         saleTypeHtml = `<span class="badge">${ticket.saleType}</span>`;
                     }
                     
-                    // Handle SOLD indicators for Family/Direct tickets without prices
-                    const priceDisplay = (!ticket.listPrice && (ticket.isFamily || ticket.isDirect)) 
-                        ? '<span class="badge sold-badge"><i class="fas fa-check-circle"></i> SOLD</span>' 
-                        : (ticket.listPrice || '-');
+                    // Just display the price if available, don't show SOLD indicator here
+                    const priceDisplay = ticket.listPrice || '-';
                     
                     // Create StubHub/AXS link if price is available
                     let stubhubDisplay = '';
@@ -2061,12 +2074,13 @@
                         stubhubDisplay = `<a href="${siteUrl}" target="_blank" class="badge badge-stubhub"><i class="fas fa-ticket-alt"></i> ${ticket.stubhubPrice}</a>`;
                     }
                     
-                    // Action button (or coming soon text, or sold indicator)
+                    // Action button (or coming soon text)
                     let actionHtml = '';
                     if (ticket.isComingSoon) {
                         actionHtml = '<span class="coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
                     } else if ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) {
-                        actionHtml = '<span class="badge sold-badge"><i class="fas fa-check-circle"></i> SOLD</span>';
+                        // Don't show anything in action column for sold tickets
+                        actionHtml = '';
                     } else {
                         actionHtml = `
                             <a href="#" class="button inquiry-button" 
