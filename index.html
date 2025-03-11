@@ -778,6 +778,23 @@
             font-weight: 500;
             font-size: 0.85rem;
         }
+        
+        .seat-coming-soon {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            background-color: var(--accent-color);
+            color: var(--text-light);
+            animation: pulse-glow 2s infinite alternate;
+        }
+        
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 3px rgba(76, 201, 240, 0.3);
+            }
+            100% {
+                box-shadow: 0 0 10px rgba(76, 201, 240, 0.8);
+            }
+        }
 
         .concert-date {
             white-space: nowrap;
@@ -802,18 +819,84 @@
         .badge-family {
             background-color: var(--success);
             color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .badge-family::before {
+            content: "✓";
+            position: absolute;
+            right: -4px;
+            top: -3px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            transform: rotate(15deg);
+            animation: sparkle 1.5s infinite alternate ease-in-out;
+        }
+        
+        .badge-direct {
+            background-color: #5e60ce;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .badge-direct::before {
+            content: "✓";
+            position: absolute;
+            right: -4px;
+            top: -3px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            transform: rotate(15deg);
+            animation: sparkle 1.5s infinite alternate ease-in-out;
+        }
+        
+        .sold-badge {
+            background-color: #ef476f;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            animation: pulse-sold 1.5s infinite alternate;
+        }
+        
+        @keyframes pulse-sold {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+        
+        @keyframes sparkle {
+            0% {
+                opacity: 0.6;
+                transform: rotate(15deg) scale(1);
+            }
+            100% {
+                opacity: 1;
+                transform: rotate(15deg) scale(1.2);
+            }
         }
 
         .badge-stubhub {
             background-color: var(--primary-light);
             color: white;
             transition: all 0.2s ease;
+            display: inline-block;
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
         }
         
         a.badge-stubhub:hover {
             background-color: var(--primary-color);
             transform: translateY(-2px);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
         }
 
         .no-results {
@@ -1137,6 +1220,7 @@
                 <select id="type-filter">
                     <option value="">All Types</option>
                     <option value="Family">Family</option>
+                    <option value="Direct">Direct</option>
                     <option value="StubHub">StubHub</option>
                     <option value="Coming Soon">Coming Soon</option>
                 </select>
@@ -1164,10 +1248,9 @@
                         <th>Concert</th>
                         <th>Date</th>
                         <th>Seat</th>
-                        <th>List Price</th>
-                        <th>StubHub Price</th>
+                        <th style="text-align: center;">YOUR PRICE/DIRECT</th>
+                        <th>STUBHUB/AXS</th>
                         <th>Action</th>
-                        <th>Compare StubHub</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1410,8 +1493,13 @@
             const tableBody = document.querySelector('#tickets-table tbody');
             tableBody.innerHTML = '';
 
-            // Show rows that have either a list price OR are marked as coming soon
-            const filteredData = data.filter(ticket => ticket.listPrice || ticket.isComingSoon);
+            // Show rows that have a list price, are coming soon, or are Family/Direct tickets
+            const filteredData = data.filter(ticket => 
+                ticket.listPrice || 
+                ticket.isComingSoon || 
+                ticket.saleType.toLowerCase().includes('family') ||
+                ticket.saleType.toLowerCase().includes('direct')
+            );
 
             if (filteredData.length === 0) {
                 const row = document.createElement('tr');
@@ -1419,38 +1507,94 @@
                 tableBody.appendChild(row);
                 return;
             }
-
+            
+            // Group tickets by concert for highlighting
+            const concertGroups = {};
+            
+            // Create groups by concert name
             filteredData.forEach(ticket => {
-                const row = document.createElement('tr');
-
-                // Create the badge for sale type
-                let saleTypeBadge = '';
-                if (ticket.saleType.toLowerCase().includes('family')) {
-                    saleTypeBadge = `<span class="badge badge-family">Family</span>`;
-                } else if (ticket.saleType.toLowerCase().includes('stubhub')) {
-                    // Create clickable StubHub badge that opens search in new tab
-                    const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
-                    saleTypeBadge = `<a href="${stubhubUrl}" target="_blank" class="badge badge-stubhub" style="text-decoration: none;">StubHub <i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i></a>`;
-                } else {
-                    saleTypeBadge = ticket.saleType;
+                if (!concertGroups[ticket.concert]) {
+                    concertGroups[ticket.concert] = [];
                 }
-
-                // Generate StubHub button (moved to last column)
-                const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
-                const stubhubButton = `<a href="${stubhubUrl}" target="_blank" class="button secondary" style="font-size: 0.85rem;"><i class="fas fa-external-link-alt"></i> Compare StubHub</a>`;
+                concertGroups[ticket.concert].push(ticket);
+            });
+            
+            // Add a CSS class for the first row in each concert group
+            const tanStyle = document.createElement('style');
+            tanStyle.textContent = `
+                .first-concert-row {
+                    background-color: #e6f7e9 !important; /* Light green color */
+                }
+                .first-concert-row:hover {
+                    background-color: #d4f0d9 !important; /* Darker shade of green on hover */
+                }
+            `;
+            document.head.appendChild(tanStyle);
+            
+            // Process each concert group
+            Object.keys(concertGroups).forEach(concertName => {
+                const concertTickets = concertGroups[concertName];
                 
-                row.innerHTML = `
-                    <td><strong>${ticket.concert}</strong></td>
-                    <td class="concert-date"><i class="far fa-calendar-alt"></i> ${ticket.date}</td>
-                    <td>${ticket.seat}</td>
-                    <td class="price">${formatPrice(ticket.listPrice)}</td>
-                    <td class="price">${formatPrice(ticket.stubhubPrice)}</td>
-                    <td>${ticket.isComingSoon ?
-                        '<span class="coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>' :
-                        `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}"><i class="far fa-envelope"></i> Inquire</a>`}</td>
-                    <td>${ticket.isComingSoon ? '' : stubhubButton}</td>
-                `;
-                tableBody.appendChild(row);
+                // Sort tickets by date or other criteria if needed
+                concertTickets.sort((a, b) => {
+                    // First by date, then by seat
+                    return a.date.localeCompare(b.date) || a.seat.localeCompare(b.seat);
+                });
+                
+                // Process tickets in this concert group
+                concertTickets.forEach((ticket, index) => {
+                    const row = document.createElement('tr');
+                    
+                    // Add tan highlight to the first row of each concert
+                    if (index === 0) {
+                        row.classList.add('first-concert-row');
+                    }
+
+                    // Create the badge for sale type
+                    let saleTypeBadge = '';
+                    if (ticket.saleType.toLowerCase().includes('family')) {
+                        saleTypeBadge = `<span class="badge badge-family">Family <i class="fas fa-ticket-alt"></i></span>`;
+                    } else if (ticket.saleType.toLowerCase().includes('direct')) {
+                        saleTypeBadge = `<span class="badge badge-direct">Direct <i class="fas fa-ticket-alt"></i></span>`;
+                    } else if (ticket.saleType.toLowerCase().includes('stubhub')) {
+                        // Create clickable StubHub badge that opens search in new tab
+                        const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
+                        saleTypeBadge = `<a href="${stubhubUrl}" target="_blank" class="badge badge-stubhub" style="text-decoration: none;">StubHub <i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i></a>`;
+                    } else {
+                        saleTypeBadge = ticket.saleType;
+                    }
+
+                    // Generate StubHub button (moved to last column)
+                    const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
+                    const stubhubButton = `<a href="${stubhubUrl}" target="_blank" class="button secondary" style="font-size: 0.85rem;"><i class="fas fa-external-link-alt"></i> Compare StubHub</a>`;
+                    
+                    // Handle SOLD indicators for Family/Direct tickets without prices
+                    const priceDisplay = (!ticket.listPrice && (ticket.isFamily || ticket.isDirect)) 
+                        ? '<span class="badge sold-badge"><i class="fas fa-check-circle"></i> SOLD</span>' 
+                        : formatPrice(ticket.listPrice);
+                    
+                    // Create StubHub/AXS link if price is available
+                    let stubhubDisplay = '';
+                    if (ticket.stubhubPrice) {
+                        const siteUrl = generateStubHubUrl(ticket.concert, ticket.seat);
+                        stubhubDisplay = `<a href="${siteUrl}" target="_blank" class="badge badge-stubhub"><i class="fas fa-ticket-alt"></i> ${formatPrice(ticket.stubhubPrice)}</a>`;
+                    }
+
+                    row.innerHTML = `
+                        <td><strong>${ticket.concert}</strong></td>
+                        <td class="concert-date"><i class="far fa-calendar-alt"></i> ${ticket.date}</td>
+                        <td>${ticket.seat ? ticket.seat : '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>'}</td>
+                        <td class="price" style="text-align: center;">${priceDisplay}</td>
+                        <td class="price">${stubhubDisplay}</td>
+                        <td>${ticket.isComingSoon ?
+                            '' :
+                            ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) ?
+                              '' : // Don't show inquiry button for sold tickets
+                              `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}"><i class="far fa-envelope"></i> Inquire</a>`
+                        }</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
             });
 
             // Add event listeners for the inquiry buttons
@@ -1515,6 +1659,10 @@
 
             if (typeValue === "Coming Soon") {
                 filteredData = filteredData.filter(ticket => ticket.isComingSoon);
+            } else if (typeValue === "Family") {
+                filteredData = filteredData.filter(ticket => ticket.isFamily);
+            } else if (typeValue === "Direct") {
+                filteredData = filteredData.filter(ticket => ticket.isDirect);
             } else if (typeValue) {
                 filteredData = filteredData.filter(ticket => ticket.saleType.toLowerCase().includes(typeValue.toLowerCase()));
             }
@@ -1809,10 +1957,9 @@
                 tableHeader.innerHTML = `
                     <tr>
                         <th>Seat</th>
-                        <th>List Price</th>
-                        <th>StubHub Price</th>
+                        <th style="text-align: center;">YOUR PRICE/DIRECT</th>
+                        <th>STUBHUB/AXS</th>
                         <th>Action</th>
-                        <th>Compare StubHub</th>
                     </tr>
                 `;
                 ticketsTable.appendChild(tableHeader);
@@ -1840,7 +1987,9 @@
                     // Create badge for sale type and content
                     let saleTypeHtml = '';
                     if (ticket.saleType.toLowerCase().includes('family')) {
-                        saleTypeHtml = `<span class="badge badge-family">Family</span>`;
+                        saleTypeHtml = `<span class="badge badge-family">Family <i class="fas fa-ticket-alt"></i></span>`;
+                    } else if (ticket.saleType.toLowerCase().includes('direct')) {
+                        saleTypeHtml = `<span class="badge badge-direct">Direct <i class="fas fa-ticket-alt"></i></span>`;
                     } else if (ticket.saleType.toLowerCase().includes('stubhub')) {
                         // Create clickable StubHub badge that opens search in new tab
                         const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
@@ -1849,14 +1998,24 @@
                         saleTypeHtml = `<span class="badge">${ticket.saleType}</span>`;
                     }
                     
-                    // Format prices
-                    const listPrice = ticket.listPrice || '-';
-                    const stubhubPrice = ticket.stubhubPrice || '-';
+                    // Handle SOLD indicators for Family/Direct tickets without prices
+                    const priceDisplay = (!ticket.listPrice && (ticket.isFamily || ticket.isDirect)) 
+                        ? '<span class="badge sold-badge"><i class="fas fa-check-circle"></i> SOLD</span>' 
+                        : (ticket.listPrice || '-');
                     
-                    // Action button (or coming soon text)
+                    // Create StubHub/AXS link if price is available
+                    let stubhubDisplay = '';
+                    if (ticket.stubhubPrice) {
+                        const siteUrl = generateStubHubUrl(ticket.concert, ticket.seat);
+                        stubhubDisplay = `<a href="${siteUrl}" target="_blank" class="badge badge-stubhub"><i class="fas fa-ticket-alt"></i> ${ticket.stubhubPrice}</a>`;
+                    }
+                    
+                    // Action button (or coming soon text, or sold indicator)
                     let actionHtml = '';
                     if (ticket.isComingSoon) {
                         actionHtml = '<span class="coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
+                    } else if ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) {
+                        actionHtml = '<span class="badge sold-badge"><i class="fas fa-check-circle"></i> SOLD</span>';
                     } else {
                         actionHtml = `
                             <a href="#" class="button inquiry-button" 
@@ -1869,16 +2028,11 @@
                         `;
                     }
                     
-                    // Create StubHub button
-                    const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
-                    const stubhubButton = `<a href="${stubhubUrl}" target="_blank" class="button secondary" style="font-size: 0.85rem;"><i class="fas fa-external-link-alt"></i> Compare StubHub</a>`;
-                    
                     row.innerHTML = `
-                        <td>${ticket.seat}</td>
-                        <td class="price">${listPrice}</td>
-                        <td class="price">${stubhubPrice}</td>
+                        <td>${ticket.seat ? ticket.seat : '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>'}</td>
+                        <td class="price" style="text-align: center;">${priceDisplay}</td>
+                        <td class="price">${stubhubDisplay}</td>
                         <td>${actionHtml}</td>
-                        <td>${ticket.isComingSoon ? '' : stubhubButton}</td>
                     `;
                     
                     tableBody.appendChild(row);
@@ -2018,6 +2172,10 @@
                                 ticket.saleType.toLowerCase().includes('family')
                             );
                             
+                            const allDirect = concertTickets.every(ticket => 
+                                ticket.saleType.toLowerCase().includes('direct')
+                            );
+                            
                             const allStubHub = concertTickets.every(ticket => 
                                 ticket.saleType.toLowerCase().includes('stubhub')
                             );
@@ -2028,6 +2186,8 @@
                             
                             if (allFamily) {
                                 concertEvent.classList.add('family');
+                            } else if (allDirect) {
+                                concertEvent.classList.add('family'); // Use the same styling as family
                             } else if (allStubHub) {
                                 concertEvent.classList.add('stubhub');
                             } else if (allComingSoon) {
@@ -2140,14 +2300,19 @@
                         saleType.toLowerCase().includes('soon') ||
                         saleType.toLowerCase().includes('upcoming');
 
-                    // Include rows that have either a list price OR are some variation of "Coming Soon"
-                    if (listPrice || isComingSoon) {
+                    // Include rows that have a list price, are coming soon, or are Family/Direct sale type
+                    const isFamily = saleType.toLowerCase().includes('family');
+                    const isDirect = saleType.toLowerCase().includes('direct');
+                    
+                    if (listPrice || isComingSoon || isFamily || isDirect) {
                         return {
                             concert: row[0] || '',
                             date: row[1] || '',
                             seat: row[2] || '',
                             saleType: saleType,
                             isComingSoon: isComingSoon,
+                            isFamily: isFamily,
+                            isDirect: isDirect,
                             listPrice: listPrice,
                             stubhubPrice: row[5] || ''
                         };
