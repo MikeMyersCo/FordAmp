@@ -457,9 +457,12 @@
             height: 120px;
             border-radius: 6px;
             border: 1px solid var(--grey-light);
-            padding: 10px;
+            padding: 10px 5px;
             position: relative;
             overflow-y: auto; /* Add scrolling for days with many events */
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
         }
         
         .calendar-day.empty {
@@ -488,13 +491,18 @@
             color: white;
             border-radius: 4px;
             padding: 5px 8px;
-            margin-top: 20px;
-            font-size: 0.85rem;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: transform 0.2s;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            white-space: normal; /* Allow text to wrap */
+            line-height: 1.2;
+            display: block;
+            word-wrap: break-word;
+            max-height: 42px; /* Limit to about 3 lines of text */
+            overflow-y: auto;
         }
         
         .concert-event:hover {
@@ -1168,9 +1176,9 @@
             }
             
             .calendar-day {
-                min-height: 80px;
-                height: 80px;
-                padding: 5px;
+                min-height: 85px;
+                height: 85px;
+                padding: 5px 3px;
             }
             
             .calendar-day-header {
@@ -1179,8 +1187,12 @@
             }
             
             .concert-event {
-                font-size: 0.7rem;
+                font-size: 0.65rem;
                 padding: 3px 5px;
+                margin-top: 5px;
+                margin-bottom: 3px;
+                max-height: 34px; /* Limit height for mobile */
+                line-height: 1.1;
             }
             
             table {
@@ -2296,7 +2308,14 @@
                                 concertEvent.classList.add('coming-soon');
                             }
                             
-                            concertEvent.textContent = concert;
+                            // Condense the concert name for better display
+                            const shortName = concert.replace(/ and /gi, " & ")
+                                               .replace(/featuring/gi, "ft.")
+                                               .replace(/with special guest/gi, "w/")
+                                               .replace(/with/gi, "w/");
+                                               
+                            concertEvent.textContent = shortName;
+                            concertEvent.title = concert; // Add title attribute for showing full name on hover
                             concertEvent.addEventListener('click', function() {
                                 openPopup(concert, dateKey);
                             });
