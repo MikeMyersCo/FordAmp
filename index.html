@@ -860,6 +860,47 @@
             animation: pulse-sold 1.5s infinite alternate;
         }
         
+        .sold-overlay {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .sold-overlay .seat-number {
+            opacity: 0.6;
+            font-weight: 500;
+        }
+        
+        .sold-overlay::after {
+            content: "SOLD";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            color: #ef476f;
+            font-weight: 800;
+            font-size: 1.2em;
+            text-shadow: 
+                -1px -1px 0 white,
+                1px -1px 0 white,
+                -1px 1px 0 white,
+                1px 1px 0 white;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            pointer-events: none;
+            animation: sold-blink 2s infinite alternate;
+        }
+        
+        @keyframes sold-blink {
+            0% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) rotate(-30deg) scale(1);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) rotate(-30deg) scale(1.1);
+            }
+        }
+        
         @keyframes pulse-sold {
             0% {
                 transform: scale(1);
@@ -1580,10 +1621,20 @@
                         stubhubDisplay = `<a href="${siteUrl}" target="_blank" class="badge badge-stubhub"><i class="fas fa-ticket-alt"></i> ${formatPrice(ticket.stubhubPrice)}</a>`;
                     }
 
+                    // Determine seat display based on sold status
+                    let seatDisplay = '';
+                    if (!ticket.seat) {
+                        seatDisplay = '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
+                    } else if ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) {
+                        seatDisplay = `<span class="sold-overlay"><span class="seat-number">${ticket.seat}</span></span>`;
+                    } else {
+                        seatDisplay = ticket.seat;
+                    }
+                    
                     row.innerHTML = `
                         <td><strong>${ticket.concert}</strong></td>
                         <td class="concert-date"><i class="far fa-calendar-alt"></i> ${ticket.date}</td>
-                        <td>${ticket.seat ? ticket.seat : '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>'}</td>
+                        <td>${seatDisplay}</td>
                         <td class="price" style="text-align: center;">${priceDisplay}</td>
                         <td class="price">${stubhubDisplay}</td>
                         <td>${ticket.isComingSoon ?
@@ -2028,8 +2079,18 @@
                         `;
                     }
                     
+                    // Determine seat display based on sold status
+                    let seatDisplay = '';
+                    if (!ticket.seat) {
+                        seatDisplay = '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
+                    } else if ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) {
+                        seatDisplay = `<span class="sold-overlay"><span class="seat-number">${ticket.seat}</span></span>`;
+                    } else {
+                        seatDisplay = ticket.seat;
+                    }
+                    
                     row.innerHTML = `
-                        <td>${ticket.seat ? ticket.seat : '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>'}</td>
+                        <td>${seatDisplay}</td>
                         <td class="price" style="text-align: center;">${priceDisplay}</td>
                         <td class="price">${stubhubDisplay}</td>
                         <td>${actionHtml}</td>
