@@ -471,11 +471,16 @@
         }
         
         .calendar-day-number {
-            position: absolute;
-            top: 5px;
-            right: 10px;
+            position: relative;
+            margin: 0 auto 8px auto;
             font-weight: 700;
             color: var(--grey-dark);
+            text-align: center;
+            font-size: 1rem;
+            background-color: rgba(240, 240, 240, 0.7);
+            border-radius: 3px;
+            padding: 1px 0;
+            width: 100%;
         }
         
         .calendar-day.today {
@@ -490,9 +495,9 @@
             background-color: var(--primary-light);
             color: white;
             border-radius: 4px;
-            padding: 5px 8px;
-            margin-top: 10px;
-            margin-bottom: 5px;
+            padding: 4px 6px;
+            margin-top: 2px;
+            margin-bottom: 3px;
             font-size: 0.75rem;
             cursor: pointer;
             transition: transform 0.2s;
@@ -501,8 +506,9 @@
             line-height: 1.2;
             display: block;
             word-wrap: break-word;
-            max-height: 42px; /* Limit to about 3 lines of text */
+            max-height: 54px; /* Slightly increased to allow more text */
             overflow-y: auto;
+            flex: 0 0 auto;
         }
         
         .concert-event:hover {
@@ -1176,9 +1182,15 @@
             }
             
             .calendar-day {
-                min-height: 85px;
-                height: 85px;
-                padding: 5px 3px;
+                min-height: 90px;
+                height: 90px;
+                padding: 3px 2px;
+            }
+            
+            .calendar-day-number {
+                font-size: 0.85rem;
+                margin-bottom: 4px;
+                padding: 0;
             }
             
             .calendar-day-header {
@@ -1188,10 +1200,10 @@
             
             .concert-event {
                 font-size: 0.65rem;
-                padding: 3px 5px;
-                margin-top: 5px;
-                margin-bottom: 3px;
-                max-height: 34px; /* Limit height for mobile */
+                padding: 3px 4px;
+                margin-top: 1px;
+                margin-bottom: 2px;
+                max-height: 38px; /* Slightly increased for mobile */
                 line-height: 1.1;
             }
             
