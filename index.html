@@ -242,19 +242,20 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             background-color: var(--primary-color);
             color: white;
             font-weight: 500;
-            padding: 10px 18px;
+            padding: 6px 12px;
             border-radius: 6px;
             text-decoration: none;
             transition: all 0.2s ease;
             border: none;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
         }
 
         .button:hover {
@@ -754,8 +755,29 @@
 
         th,
         td {
-            padding: 16px 20px;
+            padding: 12px 10px;
             text-align: left;
+        }
+        
+        /* Fixed widths for table columns */
+        table th:nth-child(3), /* Seat */
+        table td:nth-child(3) {
+            width: 100px;
+        }
+        
+        table th:nth-child(4), /* Price */
+        table td:nth-child(4) {
+            width: 110px;
+        }
+        
+        table th:nth-child(5), /* StubHub */
+        table td:nth-child(5) {
+            width: 110px;
+        }
+        
+        table th:nth-child(6), /* Action */
+        table td:nth-child(6) {
+            width: 100px;
         }
 
         th {
@@ -788,21 +810,23 @@
         .coming-soon {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             background-color: var(--warning);
             color: var(--text-dark);
-            padding: 8px 12px;
+            padding: 5px 8px;
             border-radius: 4px;
             font-weight: 500;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
         
         .seat-coming-soon {
-            padding: 5px 10px;
-            font-size: 0.8rem;
+            padding: 4px 8px;
+            font-size: 0.75rem;
             background-color: var(--accent-color);
             color: var(--text-light);
             animation: pulse-glow 2s infinite alternate;
+            white-space: nowrap;
         }
         
         @keyframes pulse-glow {
@@ -962,10 +986,14 @@
             transition: all 0.2s ease;
             display: inline-block;
             border-radius: 30px;
-            padding: 5px 15px;
-            font-size: 0.8rem;
+            padding: 3px 10px;
+            font-size: 0.75rem;
             font-weight: 600;
             text-decoration: none;
+            white-space: nowrap;
+            max-width: 110px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         a.badge-stubhub:hover {
@@ -1698,14 +1726,16 @@
                     row.innerHTML = `
                         <td><strong>${ticket.concert}</strong></td>
                         <td class="concert-date"><i class="far fa-calendar-alt"></i> ${ticket.date}</td>
-                        <td>${seatDisplay}</td>
+                        <td>${ticket.seat && ticket.isDirect ? 
+                            `<span class="sold-overlay"><span class="seat-number">${ticket.seat}</span></span>` : 
+                            seatDisplay}</td>
                         <td class="price" style="text-align: center;">${priceDisplay}</td>
                         <td class="price">${stubhubDisplay}</td>
                         <td>${ticket.isComingSoon ?
                             '' :
-                            ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) ?
-                              '' : // Don't show inquiry button for sold tickets
-                              `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}"><i class="fas fa-sms"></i> Text Me</a>`
+                            ticket.isDirect ?
+                              '' : // Don't show inquiry button for Direct tickets
+                              `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}"><i class="fas fa-sms"></i> Text</a>`
                         }</td>
                     `;
                     tableBody.appendChild(row);
@@ -2128,8 +2158,8 @@
                     let actionHtml = '';
                     if (ticket.isComingSoon) {
                         actionHtml = '<span class="coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
-                    } else if ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) {
-                        // Don't show anything in action column for sold tickets
+                    } else if (ticket.isFamily || ticket.isDirect) {
+                        // Don't show anything in action column for sold tickets (Family/Direct)
                         actionHtml = '';
                     } else {
                         actionHtml = `
@@ -2138,7 +2168,7 @@
                                data-concert="${ticket.concert}" 
                                data-date="${ticket.date}" 
                                data-price="${ticket.listPrice}">
-                                <i class="fas fa-sms"></i> Text Me
+                                <i class="fas fa-sms"></i> Text
                             </a>
                         `;
                     }
@@ -2147,7 +2177,8 @@
                     let seatDisplay = '';
                     if (!ticket.seat) {
                         seatDisplay = '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
-                    } else if ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) {
+                    } else if (ticket.isFamily || ticket.isDirect) {
+                        // Mark as SOLD for all Family/Direct tickets, even with list price
                         seatDisplay = `<span class="sold-overlay"><span class="seat-number">${ticket.seat}</span></span>`;
                     } else {
                         seatDisplay = ticket.seat;
