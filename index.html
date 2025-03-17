@@ -1717,7 +1717,7 @@
                     let seatDisplay = '';
                     if (!ticket.seat) {
                         seatDisplay = '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
-                    } else if ((ticket.isFamily || ticket.isDirect) && !ticket.listPrice) {
+                    } else if (ticket.isSold) {
                         seatDisplay = `<span class="sold-overlay"><span class="seat-number">${ticket.seat}</span></span>`;
                     } else {
                         seatDisplay = ticket.seat;
@@ -1726,15 +1726,13 @@
                     row.innerHTML = `
                         <td><strong>${ticket.concert}</strong></td>
                         <td class="concert-date"><i class="far fa-calendar-alt"></i> ${ticket.date}</td>
-                        <td>${ticket.seat && ticket.isDirect ? 
-                            `<span class="sold-overlay"><span class="seat-number">${ticket.seat}</span></span>` : 
-                            seatDisplay}</td>
+                        <td>${seatDisplay}</td>
                         <td class="price" style="text-align: center;">${priceDisplay}</td>
                         <td class="price">${stubhubDisplay}</td>
                         <td>${ticket.isComingSoon ?
                             '' :
-                            ticket.isDirect ?
-                              '' : // Don't show inquiry button for Direct tickets
+                            ticket.isSold ?
+                              '' : // Don't show inquiry button for sold tickets
                               `<a href="#" class="button inquiry-button" data-seat="${ticket.seat}" data-concert="${ticket.concert}" data-date="${ticket.date}" data-price="${ticket.listPrice}"><i class="fas fa-sms"></i> Text</a>`
                         }</td>
                     `;
@@ -2158,8 +2156,8 @@
                     let actionHtml = '';
                     if (ticket.isComingSoon) {
                         actionHtml = '<span class="coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
-                    } else if (ticket.isFamily || ticket.isDirect) {
-                        // Don't show anything in action column for sold tickets (Family/Direct)
+                    } else if (ticket.isSold) {
+                        // Don't show anything in action column for sold tickets
                         actionHtml = '';
                     } else {
                         actionHtml = `
@@ -2177,8 +2175,8 @@
                     let seatDisplay = '';
                     if (!ticket.seat) {
                         seatDisplay = '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
-                    } else if (ticket.isFamily || ticket.isDirect) {
-                        // Mark as SOLD for all Family/Direct tickets, even with list price
+                    } else if (ticket.isSold) {
+                        // Mark as SOLD for all sold tickets
                         seatDisplay = `<span class="sold-overlay"><span class="seat-number">${ticket.seat}</span></span>`;
                     } else {
                         seatDisplay = ticket.seat;
@@ -2325,12 +2323,8 @@
                                 ticket.concert === concert && ticket.date === dateKey
                             );
                             
-                            const allFamily = concertTickets.every(ticket => 
-                                ticket.saleType.toLowerCase().includes('family')
-                            );
-                            
-                            const allDirect = concertTickets.every(ticket => 
-                                ticket.saleType.toLowerCase().includes('direct')
+                            const allSold = concertTickets.every(ticket => 
+                                ticket.isSold
                             );
                             
                             const allStubHub = concertTickets.every(ticket => 
@@ -2341,10 +2335,8 @@
                                 ticket.isComingSoon
                             );
                             
-                            if (allFamily) {
-                                concertEvent.classList.add('family');
-                            } else if (allDirect) {
-                                concertEvent.classList.add('family'); // Use the same styling as family
+                            if (allSold) {
+                                concertEvent.classList.add('family'); // Use family styling for sold tickets
                             } else if (allStubHub) {
                                 concertEvent.classList.add('stubhub');
                             } else if (allComingSoon) {
@@ -2454,10 +2446,11 @@
 
                 // Map the spreadsheet columns to our data structure
                 // Column indices based on your spreadsheet:
-                // 0=Concert, 1=Date, 2=Seat, 3=Sale Type, 4=List Price, 5=StubHub Price
+                // 0=Concert, 1=Date, 2=Seat, 3=Sale Type, 4=List Price, 5=StubHub Price, 6=Date Sold
                 const tickets = rows.map(row => {
                     const listPrice = row[4] ? row[4] : '';
                     const saleType = row[3] || '';
+                    const dateSold = row[6] || '';
 
                     // Check if it's a coming soon ticket (case insensitive and includes partial matches)
                     const isComingSoon = saleType.toLowerCase().includes('coming') ||
@@ -2467,6 +2460,8 @@
                     // Include rows that have a list price, are coming soon, or are Family/Direct sale type
                     const isFamily = saleType.toLowerCase().includes('family');
                     const isDirect = saleType.toLowerCase().includes('direct');
+                    // Mark as sold if there's a date in the "Date Sold" column or it's a Family/Direct ticket
+                    const isSold = isFamily || isDirect || (dateSold && dateSold.trim() !== '');
                     
                     if (listPrice || isComingSoon || isFamily || isDirect) {
                         return {
@@ -2477,6 +2472,8 @@
                             isComingSoon: isComingSoon,
                             isFamily: isFamily,
                             isDirect: isDirect,
+                            isSold: isSold,
+                            dateSold: dateSold,
                             listPrice: listPrice,
                             stubhubPrice: row[5] || ''
                         };
