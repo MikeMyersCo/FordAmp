@@ -1356,7 +1356,6 @@
                     <option value="">All Types</option>
                     <option value="Family">Family</option>
                     <option value="Direct">Direct</option>
-                    <option value="StubHub">StubHub</option>
                     <option value="Coming Soon">Coming Soon</option>
                 </select>
             </div>
@@ -1384,7 +1383,6 @@
                         <th>Date</th>
                         <th>Seat</th>
                         <th style="text-align: center;">YOUR PRICE/DIRECT</th>
-                        <th>STUBHUB/AXS</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -1612,16 +1610,7 @@
         }
         
         // Generate StubHub URL for ticket search based on seat information
-        function generateStubHubUrl(concert, seat) {
-            // Clean up and normalize the concert name for the search query
-            const cleanConcert = concert.trim();
-            
-            // StubHub uses a simpler search URL format
-            // We'll use their main search endpoint which should find any event
-            const stubHubUrl = `https://www.stubhub.com/search?q=${encodeURIComponent(cleanConcert)}`;
-            
-            return stubHubUrl;
-        }
+        // StubHub URL generation function removed
 
         // Function to populate the table
         function populateTable(data) {
@@ -1691,27 +1680,13 @@
                         saleTypeBadge = `<span class="badge badge-family">Family <i class="fas fa-ticket-alt"></i></span>`;
                     } else if (ticket.saleType.toLowerCase().includes('direct')) {
                         saleTypeBadge = `<span class="badge badge-direct">Direct <i class="fas fa-ticket-alt"></i></span>`;
-                    } else if (ticket.saleType.toLowerCase().includes('stubhub')) {
-                        // Create clickable StubHub badge that opens search in new tab
-                        const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
-                        saleTypeBadge = `<a href="${stubhubUrl}" target="_blank" class="badge badge-stubhub" style="text-decoration: none;">StubHub <i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i></a>`;
+                    // StubHub option removed
                     } else {
                         saleTypeBadge = ticket.saleType;
                     }
 
-                    // Generate StubHub button (moved to last column)
-                    const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
-                    const stubhubButton = `<a href="${stubhubUrl}" target="_blank" class="button secondary" style="font-size: 0.85rem;"><i class="fas fa-external-link-alt"></i> Compare StubHub</a>`;
-                    
                     // Just display the price if available, don't show SOLD indicator here
                     const priceDisplay = formatPrice(ticket.listPrice);
-                    
-                    // Create StubHub/AXS link if price is available
-                    let stubhubDisplay = '';
-                    if (ticket.stubhubPrice) {
-                        const siteUrl = generateStubHubUrl(ticket.concert, ticket.seat);
-                        stubhubDisplay = `<a href="${siteUrl}" target="_blank" class="badge badge-stubhub"><i class="fas fa-ticket-alt"></i> ${formatPrice(ticket.stubhubPrice)}</a>`;
-                    }
 
                     // Determine seat display based on sold status
                     let seatDisplay = '';
@@ -1728,7 +1703,6 @@
                         <td class="concert-date"><i class="far fa-calendar-alt"></i> ${ticket.date}</td>
                         <td>${seatDisplay}</td>
                         <td class="price" style="text-align: center;">${priceDisplay}</td>
-                        <td class="price">${stubhubDisplay}</td>
                         <td>${ticket.isComingSoon ?
                             '' :
                             ticket.isSold ?
@@ -2102,7 +2076,6 @@
                     <tr>
                         <th>Seat</th>
                         <th style="text-align: center;">YOUR PRICE/DIRECT</th>
-                        <th>STUBHUB/AXS</th>
                         <th>Action</th>
                     </tr>
                 `;
@@ -2134,10 +2107,7 @@
                         saleTypeHtml = `<span class="badge badge-family">Family <i class="fas fa-ticket-alt"></i></span>`;
                     } else if (ticket.saleType.toLowerCase().includes('direct')) {
                         saleTypeHtml = `<span class="badge badge-direct">Direct <i class="fas fa-ticket-alt"></i></span>`;
-                    } else if (ticket.saleType.toLowerCase().includes('stubhub')) {
-                        // Create clickable StubHub badge that opens search in new tab
-                        const stubhubUrl = generateStubHubUrl(ticket.concert, ticket.seat);
-                        saleTypeHtml = `<a href="${stubhubUrl}" target="_blank" class="badge badge-stubhub" style="text-decoration: none;">StubHub <i class="fas fa-external-link-alt" style="font-size: 0.7em;"></i></a>`;
+                    // StubHub option removed
                     } else {
                         saleTypeHtml = `<span class="badge">${ticket.saleType}</span>`;
                     }
@@ -2145,12 +2115,7 @@
                     // Just display the price if available, don't show SOLD indicator here
                     const priceDisplay = ticket.listPrice || '-';
                     
-                    // Create StubHub/AXS link if price is available
-                    let stubhubDisplay = '';
-                    if (ticket.stubhubPrice) {
-                        const siteUrl = generateStubHubUrl(ticket.concert, ticket.seat);
-                        stubhubDisplay = `<a href="${siteUrl}" target="_blank" class="badge badge-stubhub"><i class="fas fa-ticket-alt"></i> ${ticket.stubhubPrice}</a>`;
-                    }
+                    // StubHub price display removed
                     
                     // Action button (or coming soon text)
                     let actionHtml = '';
@@ -2185,7 +2150,6 @@
                     row.innerHTML = `
                         <td>${seatDisplay}</td>
                         <td class="price" style="text-align: center;">${priceDisplay}</td>
-                        <td class="price">${stubhubDisplay}</td>
                         <td>${actionHtml}</td>
                     `;
                     
@@ -2327,9 +2291,7 @@
                                 ticket.isSold
                             );
                             
-                            const allStubHub = concertTickets.every(ticket => 
-                                ticket.saleType.toLowerCase().includes('stubhub')
-                            );
+                            // StubHub check removed
                             
                             const allComingSoon = concertTickets.every(ticket => 
                                 ticket.isComingSoon
@@ -2337,8 +2299,6 @@
                             
                             if (allSold) {
                                 concertEvent.classList.add('family'); // Use family styling for sold tickets
-                            } else if (allStubHub) {
-                                concertEvent.classList.add('stubhub');
                             } else if (allComingSoon) {
                                 concertEvent.classList.add('coming-soon');
                             }
@@ -2446,7 +2406,7 @@
 
                 // Map the spreadsheet columns to our data structure
                 // Column indices based on your spreadsheet:
-                // 0=Concert, 1=Date, 2=Seat, 3=Sale Type, 4=List Price, 5=StubHub Price, 6=Date Sold
+                // 0=Concert, 1=Date, 2=Seat, 3=Sale Type, 4=List Price, 5=(unused), 6=Date Sold
                 const tickets = rows.map(row => {
                     const listPrice = row[4] ? row[4] : '';
                     const saleType = row[3] || '';
@@ -2474,8 +2434,8 @@
                             isDirect: isDirect,
                             isSold: isSold,
                             dateSold: dateSold,
-                            listPrice: listPrice,
-                            stubhubPrice: row[5] || ''
+                            listPrice: listPrice
+                            // StubHub price field removed
                         };
                     }
                     return null;
