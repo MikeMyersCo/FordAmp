@@ -623,6 +623,13 @@
             margin-right: 5px;
         }
         
+        .popup-ticket-count .sold-count {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            font-weight: normal;
+            margin-left: 4px;
+        }
+        
         .popup-tickets {
             margin-top: 15px;
             max-height: 300px;
@@ -2058,12 +2065,26 @@
                 const ticketsList = document.getElementById('popup-tickets-list');
                 ticketsList.innerHTML = '';
                 
-                // Update ticket count
-                document.getElementById('popup-ticket-count').textContent = concertTickets.length;
+                // Update available ticket count (excluding sold tickets)
+                const availableTickets = concertTickets.filter(ticket => !ticket.isSold);
+                const soldTickets = concertTickets.filter(ticket => ticket.isSold);
+                document.getElementById('popup-ticket-count').textContent = availableTickets.length;
                 
-                if (concertTickets.length === 0) {
-                    ticketsList.innerHTML = '<p>No tickets available for this date.</p>';
-                    return;
+                // Update total tickets message if there are any sold tickets
+                const ticketCountElem = document.getElementById('popup-ticket-count').parentNode;
+                if (soldTickets.length > 0) {
+                    ticketCountElem.innerHTML = `<i class="fas fa-ticket-alt"></i> <span id="popup-ticket-count">${availableTickets.length}</span> Available Tickets <span class="sold-count">(${soldTickets.length} sold)</span>`;
+                } else {
+                    ticketCountElem.innerHTML = `<i class="fas fa-ticket-alt"></i> <span id="popup-ticket-count">${availableTickets.length}</span> Available Tickets`;
+                }
+                
+                if (availableTickets.length === 0) {
+                    if (soldTickets.length > 0) {
+                        ticketsList.innerHTML = '<p>All tickets for this date have been sold.</p>';
+                    } else {
+                        ticketsList.innerHTML = '<p>No tickets available for this date.</p>';
+                    }
+                    // Still show the tickets even if they're all sold
                 }
                 
                 // Create a table to display all tickets
