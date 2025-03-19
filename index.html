@@ -1662,14 +1662,57 @@
             `;
             document.head.appendChild(tanStyle);
             
-            // Process each concert group
-            Object.keys(concertGroups).forEach(concertName => {
-                const concertTickets = concertGroups[concertName];
+            // Process each concert group sorted by date
+            Object.keys(concertGroups)
+                .sort((a, b) => {
+                    // Get the first ticket from each concert (assuming same date for all tickets in concert)
+                    const ticketA = concertGroups[a][0];
+                    const ticketB = concertGroups[b][0];
+                    
+                    // Parse dates (format MM/DD/YYYY)
+                    const partsA = ticketA.date.split('/');
+                    const partsB = ticketB.date.split('/');
+                    
+                    // Create Date objects with year, month (0-based), day
+                    const dateA = new Date(
+                        parseInt(partsA[2]), // Year
+                        parseInt(partsA[0]) - 1, // Month (0-based)
+                        parseInt(partsA[1]) // Day
+                    );
+                    
+                    const dateB = new Date(
+                        parseInt(partsB[2]), // Year
+                        parseInt(partsB[0]) - 1, // Month (0-based)
+                        parseInt(partsB[1]) // Day
+                    );
+                    
+                    // Sort by date
+                    return dateA - dateB;
+                })
+                .forEach(concertName => {
+                    const concertTickets = concertGroups[concertName];
                 
                 // Sort tickets by date or other criteria if needed
                 concertTickets.sort((a, b) => {
+                    // Parse dates (format MM/DD/YYYY)
+                    const partsA = a.date.split('/');
+                    const partsB = b.date.split('/');
+                    
+                    // Create Date objects with year, month (0-based), day
+                    const dateA = new Date(
+                        parseInt(partsA[2]), // Year
+                        parseInt(partsA[0]) - 1, // Month (0-based)
+                        parseInt(partsA[1]) // Day
+                    );
+                    
+                    const dateB = new Date(
+                        parseInt(partsB[2]), // Year
+                        parseInt(partsB[0]) - 1, // Month (0-based)
+                        parseInt(partsB[1]) // Day
+                    );
+                    
                     // First by date, then by seat
-                    return a.date.localeCompare(b.date) || a.seat.localeCompare(b.seat);
+                    return dateA - dateB || a.seat.localeCompare(b.seat);
                 });
                 
                 // Process tickets in this concert group
