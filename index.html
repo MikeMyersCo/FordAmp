@@ -2454,7 +2454,7 @@
                 
                 const response = await gapi.client.sheets.spreadsheets.values.get({
                     spreadsheetId: spreadsheetId,
-                    range: '2025!A2:Q',  // Your sheet range
+                    range: '2025!A2:L',  // Updated range to match new column layout (A-L)
                 });
                 
                 console.log('API response received:', response);
@@ -2469,11 +2469,15 @@
                 }
 
                 // Map the spreadsheet columns to our data structure
-                // Column indices based on your spreadsheet:
-                // 0=Concert, 1=Date, 2=Seat, 3=Sale Type, 4=List Price, 5=(unused), 6=Date Sold
+                // Column indices based on your rearranged spreadsheet:
+                // 0=Concert, 1=Date, 2=Seat, 3=List Price, 4=Sale Type, 5=Sale Price, 
+                // 6=Date Sold, 7=Date Paid, 8=Buyer, 9=Cost, 10=% Profit, 11=Profit
                 const tickets = rows.map(row => {
-                    const listPrice = row[4] ? row[4] : '';
-                    const saleType = row[3] || '';
+                    const concert = row[0] || '';
+                    const date = row[1] || '';
+                    const seat = row[2] || '';
+                    const listPrice = row[3] ? row[3] : '';
+                    const saleType = row[4] || '';
                     const dateSold = row[6] || '';
 
                     // Check if it's a coming soon ticket (case insensitive and includes partial matches)
@@ -2489,9 +2493,9 @@
                     
                     if (listPrice || isComingSoon || isFamily || isDirect) {
                         return {
-                            concert: row[0] || '',
-                            date: row[1] || '',
-                            seat: row[2] || '',
+                            concert: concert,
+                            date: date,
+                            seat: seat,
                             saleType: saleType,
                             isComingSoon: isComingSoon,
                             isFamily: isFamily,
