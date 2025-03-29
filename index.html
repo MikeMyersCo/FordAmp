@@ -1625,11 +1625,13 @@
             tableBody.innerHTML = '';
 
             // Show rows that have a list price, are coming soon, or are Family/Direct tickets
+            // Filter out tickets where sale type is "Venu"
             const filteredData = data.filter(ticket => 
-                ticket.listPrice || 
+                (ticket.listPrice || 
                 ticket.isComingSoon || 
                 ticket.saleType.toLowerCase().includes('family') ||
-                ticket.saleType.toLowerCase().includes('direct')
+                ticket.saleType.toLowerCase().includes('direct')) &&
+                !ticket.saleType.toLowerCase().includes('venu')
             );
 
             if (filteredData.length === 0) {
