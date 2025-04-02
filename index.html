@@ -909,12 +909,12 @@
             animation: pulse-sold 1.5s infinite alternate;
         }
         
-        .sold-overlay {
+        .sold-overlay, .coming-soon-overlay {
             position: relative;
             display: inline-block;
         }
         
-        .sold-overlay .seat-number {
+        .sold-overlay .seat-number, .coming-soon-overlay .seat-number {
             animation: fade-seat 4s infinite ease-in-out;
             font-weight: 600;
             color: #333;
@@ -931,6 +931,27 @@
             color: #ef476f;
             font-weight: 800;
             font-size: 1.1em;
+            text-shadow: 
+                -1.5px -1.5px 0 rgba(255, 255, 255, 0.9),
+                1.5px -1.5px 0 rgba(255, 255, 255, 0.9),
+                -1.5px 1.5px 0 rgba(255, 255, 255, 0.9),
+                1.5px 1.5px 0 rgba(255, 255, 255, 0.9);
+            letter-spacing: 1px;
+            white-space: nowrap;
+            pointer-events: none;
+            animation: fade-sold 4s infinite ease-in-out;
+            z-index: 2;
+        }
+        
+        .coming-soon-overlay::after {
+            content: "COMING SOON";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            color: #ffd166;
+            font-weight: 800;
+            font-size: 0.8em;
             text-shadow: 
                 -1.5px -1.5px 0 rgba(255, 255, 255, 0.9),
                 1.5px -1.5px 0 rgba(255, 255, 255, 0.9),
@@ -1740,12 +1761,15 @@
                     // Just display the price if available, don't show SOLD indicator here
                     const priceDisplay = formatPrice(ticket.listPrice);
 
-                    // Determine seat display based on sold status
+                    // Determine seat display based on status (sold or coming soon)
                     let seatDisplay = '';
                     if (!ticket.seat) {
                         seatDisplay = '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
                     } else if (ticket.isSold) {
                         seatDisplay = `<span class="sold-overlay"><span class="seat-number">${ticket.seat}</span></span>`;
+                    } else if (ticket.saleType === "Coming Soon!") {
+                        // Mark with Coming Soon stamp
+                        seatDisplay = `<span class="coming-soon-overlay"><span class="seat-number">${ticket.seat}</span></span>`;
                     } else {
                         seatDisplay = ticket.seat;
                     }
@@ -2202,13 +2226,16 @@
                         `;
                     }
                     
-                    // Determine seat display based on sold status
+                    // Determine seat display based on status (sold or coming soon)
                     let seatDisplay = '';
                     if (!ticket.seat) {
                         seatDisplay = '<span class="coming-soon seat-coming-soon"><i class="fas fa-clock"></i> Coming Soon</span>';
                     } else if (ticket.isSold) {
                         // Mark as SOLD for all sold tickets
                         seatDisplay = `<span class="sold-overlay"><span class="seat-number">${ticket.seat}</span></span>`;
+                    } else if (ticket.saleType === "Coming Soon!") {
+                        // Mark with Coming Soon stamp
+                        seatDisplay = `<span class="coming-soon-overlay"><span class="seat-number">${ticket.seat}</span></span>`;
                     } else {
                         seatDisplay = ticket.seat;
                     }
